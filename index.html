@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UEFA XI — Efsaneler Fantezi Ligi</title>
+<meta name="theme-color" content="#060B1F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a1e; --bg-2:#0a1230; --panel:#0e1839; --panel-2:#121e4a;
+  --line:rgba(160,180,255,0.12); --line-soft:rgba(160,180,255,0.07);
+  --blue-bright:#3d6bff; --cyan:#21b6ff; --gold:#e8c25c; --gold-bright:#f5d97a; --purple:#7a5cff;
+  --text:#f3f5ff; --text-dim:#93a0c9; --text-dimmer:#5c6690;
+  --disp:'Anton',sans-serif; --body:'Manrope',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(61,107,255,0.20), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 110% 10%, rgba(122,92,255,0.14), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 50% 120%, rgba(33,182,255,0.10), transparent 60%);
+}
+h1,h2,h3{font-family:var(--disp);font-weight:400;letter-spacing:0.5px;margin:0;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px;}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--cyan);opacity:0.7;}
+.btn{font-family:var(--body);font-weight:700;font-size:15px;border:none;border-radius:999px;padding:15px 30px;cursor:pointer;transition:transform .15s ease, box-shadow .2s ease;letter-spacing:0.2px;display:inline-block;text-decoration:none;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg,var(--blue-bright),var(--cyan));color:#04081c;box-shadow:0 8px 30px -8px rgba(61,107,255,0.65);}
+.btn-primary:hover{box-shadow:0 10px 34px -6px rgba(61,107,255,0.85);transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+.starball{display:block;}
+.starball path{fill:none;stroke:currentColor;stroke-width:1.4;}
+.spin-slow{animation:spin 40s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion:reduce){.spin-slow{animation:none;}}
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(6,10,30,0.72);border-bottom:1px solid var(--line-soft);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;max-width:1180px;margin:0 auto;}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-size:20px;letter-spacing:1px;}
+.logo small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);font-weight:400;}
+.nav-badge{font-family:var(--mono);font-size:11px;color:var(--gold);border:1px solid rgba(232,194,92,0.35);border-radius:999px;padding:5px 12px;display:flex;align-items:center;gap:6px;}
+.hero{padding:90px 0 60px;position:relative;overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:40px;align-items:center;}
+.hero h1{font-size:clamp(40px,6.2vw,74px);line-height:0.98;text-transform:uppercase;}
+.hero h1 .line1{display:block;color:var(--text);}
+.hero h1 .line2{display:block;background:linear-gradient(90deg,var(--cyan),var(--blue-bright) 45%,var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero p{color:var(--text-dim);font-size:17px;max-width:480px;margin:22px 0 32px;}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;}
+.hero-art{display:flex;align-items:center;justify-content:center;position:relative;}
+.hero-art .ring{position:absolute;width:340px;height:340px;border:1px solid var(--line);border-radius:50%;}
+.hero-art .ring.r2{width:420px;height:420px;border-style:dashed;opacity:0.5;}
+.hero-stats{display:flex;gap:28px;margin-top:36px;flex-wrap:wrap;}
+.hero-stat b{font-family:var(--mono);font-size:26px;color:var(--gold);display:block;}
+.hero-stat span{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
+.ticker-wrap{border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);background:var(--bg-2);overflow:hidden;padding:14px 0;}
+.ticker{display:flex;gap:40px;white-space:nowrap;animation:ticker 30s linear infinite;width:max-content;font-family:var(--mono);font-size:13px;color:var(--text-dim);}
+.ticker span b{color:var(--cyan);}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+section{padding:80px 0;position:relative;}
+.section-head{margin-bottom:36px;max-width:640px;}
+.section-head h2{font-size:clamp(28px,4vw,42px);text-transform:uppercase;margin-top:10px;}
+.section-head p{color:var(--text-dim);margin-top:12px;font-size:15px;}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;}
+.card h4{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin:0 0 8px;font-family:var(--body);font-weight:800;}
+.card p{color:var(--text-dim);font-size:14px;margin:0;}
+.card .n{font-family:var(--mono);color:var(--text-dimmer);font-size:12px;}
+.cta-band{text-align:center;background:linear-gradient(135deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:50px 24px;}
+.cta-band h3{font-size:clamp(24px,4vw,36px);text-transform:uppercase;margin-bottom:14px;}
+.cta-band p{color:var(--text-dim);margin-bottom:26px;}
+footer{border-top:1px solid var(--line-soft);padding:36px 0;color:var(--text-dimmer);font-size:13px;text-align:center;}
+footer b{color:var(--text-dim);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <svg class="starball spin-slow" width="26" height="26" viewBox="0 0 100 100" style="color:var(--cyan)"><path d="M50 4 L58 38 L94 42 L64 58 L74 92 L50 70 L26 92 L36 58 L6 42 L42 38 Z"/></svg>
+      <div>UEFA XI <small>⭐ EFSANELER FANTEZİ LİGİ</small></div>
+    </div>
+    <div class="nav-badge">⭐ Kusursuz Sezon Rozeti</div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">1967'DEN BUGÜNE · 56 KADRO · 672 OYUNCU</div>
+      <h1>
+        <span class="line1">KITANIN EN İYİ</span>
+        <span class="line2">ON BİRİNİ KUR</span>
+      </h1>
+      <p>Kura çarkını çevir; karşına Lizbon Aslanları'ndan Sheriff Tiraspol'a, <b style="color:var(--text)">1967'den bugüne 56 gerçek kadrodan</b> biri çıksın. Efsane finalistler nadir, tarihi kadrolar ve sürpriz katılımcılar sık gelir. On birini kur, sonra takımını <b style="color:var(--text)">güncel Şampiyonlar Ligi formatında</b> sahaya sür: 8 maçlık lig fazı, haftalık puan durumu, play-off'tan finale gerçek turnuva ağacı. Maçları canlı izle, golleri dakika dakika takip et.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="game.html" target="_blank" rel="noopener">Oyuna Başla →</a>
+        <a class="btn btn-ghost" href="#how">Nasıl Oynanır</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b>56</b><span>Gerçek Kadro</span></div>
+        <div class="hero-stat"><b>672</b><span>Oyuncu</span></div>
+        <div class="hero-stat"><b>36</b><span>Takımlık Lig Fazı</span></div>
+        <div class="hero-stat"><b>5</b><span>Formasyon</span></div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="ring"></div>
+      <div class="ring r2"></div>
+      <svg class="starball spin-slow" width="230" height="230" viewBox="0 0 100 100" style="color:var(--blue-bright);animation-duration:60s;">
+        <path d="M50 4 L58 38 L94 42 L64 58 L74 92 L50 70 L26 92 L36 58 L6 42 L42 38 Z"/>
+        <path d="M50 4 L58 38 L94 42 L64 58 L74 92 L50 70 L26 92 L36 58 L6 42 L42 38 Z" transform="rotate(20 50 50) scale(0.8)" style="color:var(--gold)" stroke="var(--gold)"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">NASIL OYNANIR</div>
+      <h2>Draft, Canlı Maç, Kupa</h2>
+      <p>Oyun ayrı bir sayfada açılır. Landing page burada kalır, kadro kurma ve turnuva tamamen kendi ekranında oynanır.</p>
+    </div>
+    <div class="grid4">
+      <div class="card"><span class="n">01</span><h4>Zar At</h4><p>Çark döner, takımlar akar, biri ekranda kilitlenir. Kadrodan bir oyuncu seç; sonraki oyuncu için tekrar zar atman gerekir. Efsane finaller nadir, sürpriz katılımcılar sık çıkar.</p></div>
+      <div class="card"><span class="n">02</span><h4>3 Takım Değiştirme Hakkı</h4><p>Karşına çıkan kadroyu beğenmezsen hakkını kullan: ya aynı kulübün farklı yılı, ya da o finalin diğer takımı gelir.</p></div>
+      <div class="card"><span class="n">03</span><h4>Ayrıntılı Mevkiler</h4><p>Sağ bek, sol kanat, ön libero, on numara... Seçtikten sonra bile oyuncunun formasına tıklayıp onu ikincil mevkisine taşıyabilirsin.</p></div>
+      <div class="card"><span class="n">04</span><h4>Canlı Maç Simülasyonu</h4><p>Sonuç bir anda gelmiyor; dakika dakika ilerleyen bir maç ekranında golleri anlık görüyorsun.</p></div>
+      <div class="card"><span class="n">05</span><h4>Puan Durumu &amp; Turnuva Ağacı</h4><p>Her haftadan sonra 36 takımlık güncel sıralamayı, lig fazından sonra play-off'tan finale tüm eşleşmelerin ağacını görürsün.</p></div>
+      <div class="card"><span class="n">06</span><h4>Kusursuz Sezon</h4><p>Tüm maçları kazanıp hiç gol yemeden şampiyon olursan altın rozeti kazanırsın.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <h3>Kadronu kurmaya hazır mısın?</h3>
+      <p>Oyun yeni bir sekmede açılır.</p>
+      <a class="btn btn-primary" href="game.html" target="_blank" rel="noopener">Oyuna Başla →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <svg class="starball" width="18" height="18" viewBox="0 0 100 100" style="color:var(--text-dimmer);margin-bottom:10px;"><path d="M50 4 L58 38 L94 42 L64 58 L74 92 L50 70 L26 92 L36 58 L6 42 L42 38 Z"/></svg>
+    <div><b>UEFA XI</b> — Şampiyonlar Ligi Edisyonu</div>
+    <div style="margin-top:6px;">Kurgusal bir hayran projesidir · gerçek kulüp/turnuva logoları kullanılmamıştır · sadece eğlence amaçlıdır</div>
+  </div>
+</footer>
+
+<script>
+const CLUB_NAMES = ["Celtic '67","Nottingham Forest '79","Malmö FF '79","Steaua '86","Galatasaray '94","Ajax '95","Juventus '96","Borussia Dortmund '97","Rosenborg '97","Manchester United '99","Bayern Munich '99","Galatasaray '01","Valencia '01","Real Madrid '02","Bayer Leverkusen '02","Porto '04","Monaco '04","Liverpool '05","AC Milan '05","Arsenal '06","AC Milan '07","Fenerbahçe '08","Chelsea '08","Barcelona '09","Inter Milan '10","Barcelona '11","APOEL '12","Chelsea '12","Bayern Munich '13","Real Madrid '14","Ludogorets '14","Monaco '17","Qarabağ '17","Real Madrid '18","Liverpool '19","Ajax '19","Atalanta '20","Sheriff Tiraspol '21","Real Madrid '22","Manchester City '23"];
+const t = document.getElementById('ticker');
+const items = CLUB_NAMES.map(n=>`<span><b>${n}</b></span>`).join('');
+t.innerHTML = items+items;
+</script>
+</body>
+</html>

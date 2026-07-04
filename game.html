@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UEFA XI — Efsaneler Fantezi Ligi</title>
+<meta name="theme-color" content="#060B1F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a1e; --bg-2:#0a1230; --panel:#0e1839; --panel-2:#121e4a;
+  --line:rgba(160,180,255,0.12); --line-soft:rgba(160,180,255,0.07);
+  --blue-bright:#3d6bff; --cyan:#21b6ff; --gold:#e8c25c; --gold-bright:#f5d97a; --purple:#7a5cff;
+  --green:#33d6a6; --red:#ff5d6c;
+  --text:#f3f5ff; --text-dim:#93a0c9; --text-dimmer:#5c6690;
+  --radius:14px;
+  --disp:'Anton',sans-serif; --body:'Manrope',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:60px;}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(61,107,255,0.18), transparent 60%),
+    radial-gradient(ellipse 800px 600px at 110% 10%, rgba(122,92,255,0.12), transparent 60%);
+}
+h1,h2,h3,h4{font-family:var(--disp);font-weight:400;letter-spacing:0.5px;margin:0;}
+.wrap{max-width:1220px;margin:0 auto;padding:0 20px;position:relative;z-index:1;}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:8px;}
+.eyebrow::before{content:"";width:18px;height:1px;background:var(--cyan);opacity:0.7;}
+.btn{font-family:var(--body);font-weight:700;font-size:14px;border:none;border-radius:999px;padding:13px 24px;cursor:pointer;transition:transform .15s ease, box-shadow .2s ease, opacity .2s ease;letter-spacing:0.2px;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg,var(--blue-bright),var(--cyan));color:#04081c;box-shadow:0 8px 26px -8px rgba(61,107,255,0.65);}
+.btn-primary:hover{box-shadow:0 10px 30px -6px rgba(61,107,255,0.85);}
+.btn-primary:disabled{opacity:0.3;cursor:not-allowed;box-shadow:none;}
+.btn-gold{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#241a04;box-shadow:0 8px 26px -8px rgba(232,194,92,0.55);}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn-ghost:disabled{opacity:0.3;cursor:not-allowed;}
+.btn-sm{padding:9px 14px;font-size:12px;}
+.btn-block{width:100%;}
+.starball{display:block;}
+.starball path{fill:none;stroke:currentColor;stroke-width:1.4;}
+.spin-slow{animation:spin 40s linear infinite;}
+.spin-fast{animation:spin 1.1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes popIn{from{opacity:0;transform:scale(.94);}to{opacity:1;transform:scale(1);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.45;}}
+@media (prefers-reduced-motion:reduce){.spin-slow,.spin-fast{animation:none;}}
+
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(6,10,30,0.8);border-bottom:1px solid var(--line-soft);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1220px;margin:0 auto;}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-size:18px;letter-spacing:1px;}
+.logo small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text-dim);font-weight:400;}
+.logo a{color:inherit;text-decoration:none;}
+
+main{padding-top:26px;}
+.section-head{margin-bottom:22px;}
+.section-head h2{font-size:clamp(22px,3.4vw,32px);text-transform:uppercase;margin-top:8px;}
+.section-head p{color:var(--text-dim);margin-top:8px;font-size:13.5px;max-width:760px;}
+.section-head p b{color:var(--text);}
+
+/* ---------- TOURNAMENT PHASE BAR ---------- */
+.tree-bar{display:flex;gap:6px;overflow-x:auto;padding:14px 16px;margin:0 0 26px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);}
+.tree-node{flex:1;min-width:118px;text-align:center;padding:10px 8px;border-radius:10px;border:1px solid var(--line);position:relative;font-size:11px;}
+.tree-node .tn-label{font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--text-dimmer);font-size:9.5px;}
+.tree-node .tn-status{margin-top:6px;font-weight:700;color:var(--text-dim);font-size:11.5px;}
+.tree-node.upcoming{opacity:0.5;}
+.tree-node.active{border-color:var(--cyan);background:rgba(33,182,255,0.08);}
+.tree-node.active .tn-status{color:var(--cyan);}
+.tree-node.win{border-color:var(--green);background:rgba(51,214,166,0.08);}
+.tree-node.win .tn-status{color:var(--green);}
+.tree-node.loss{border-color:var(--red);background:rgba(255,93,108,0.08);}
+.tree-node.loss .tn-status{color:var(--red);}
+.tree-node.skip{opacity:0.35;}
+.tree-arrow{align-self:center;color:var(--text-dimmer);flex:0 0 auto;padding-top:16px;}
+
+/* ---------- DRAFT LAYOUT ---------- */
+.draft-grid2{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:20px;align-items:start;}
+@media (max-width:920px){.draft-grid2{grid-template-columns:1fr;}}
+.draft-left{display:flex;flex-direction:column;gap:14px;min-width:0;}
+.control-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+.control-card h4{font-family:var(--body);font-weight:800;font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--text-dim);margin:0 0 9px;}
+.chip-row{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.chip-row:last-child{margin-bottom:0;}
+.chip{border:1px solid var(--line);background:var(--panel-2);color:var(--text-dim);border-radius:9px;padding:9px 11px;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left;transition:all .15s;font-family:var(--body);}
+.chip:hover{border-color:var(--cyan);color:var(--text);}
+.chip.active{background:linear-gradient(135deg,var(--blue-bright),var(--cyan));color:#04081c;border-color:transparent;}
+.chip .sub{display:block;font-size:10px;font-weight:500;opacity:0.75;margin-top:2px;}
+.rating-box{padding-top:0;}
+.rating-box .num{font-family:var(--mono);font-size:32px;color:var(--gold);line-height:1;}
+.rating-box .lbl{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.subrating{display:flex;gap:14px;margin-top:10px;font-family:var(--mono);font-size:12.5px;}
+.subrating div span{display:block;color:var(--text-dimmer);font-size:9.5px;text-transform:uppercase;font-family:var(--body);}
+.swap-box{margin-top:14px;padding-top:14px;border-top:1px solid var(--line-soft);}
+.swap-dots{display:flex;gap:6px;margin:6px 0 12px;}
+.swap-dots i{width:15px;height:15px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:inline-block;}
+.swap-dots i.used{background:transparent;border-style:dashed;}
+.swap-dots i.avail{background:var(--gold);border-color:var(--gold);}
+.swap-btn-row{display:flex;flex-direction:column;gap:8px;}
+
+.roll-area{display:flex;flex-direction:column;gap:12px;}
+.roll-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.slots-counter{font-family:var(--mono);font-size:12px;color:var(--text-dim);}
+.club-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;animation:popIn .35s ease;}
+.club-head{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:center;}
+.club-head b{font-family:var(--disp);font-size:19px;letter-spacing:0.5px;}
+.club-head .yr{font-family:var(--mono);font-size:12px;color:var(--text-dim);}
+.club-head .tier{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;margin-left:8px;}
+.tier.elite{background:rgba(232,194,92,0.15);color:var(--gold);}
+.tier.mid{background:rgba(33,182,255,0.15);color:var(--cyan);}
+.tier.weak{background:rgba(255,93,108,0.12);color:var(--red);}
+.club-players{max-height:480px;overflow-y:auto;}
+.p-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line-soft);font-size:15px;flex-wrap:wrap;}
+.p-row .postags{font-family:var(--mono);font-size:12px;color:var(--text-dim);width:70px;flex-shrink:0;line-height:1.3;}
+.p-row .postags .p2{color:var(--purple);}
+.p-row .pn{flex:1;font-weight:700;min-width:110px;}
+.p-row .pn.leg{color:var(--gold);}
+.p-row .pr{font-family:var(--mono);color:var(--text);font-size:14.5px;font-weight:700;width:30px;text-align:right;flex-shrink:0;}
+.p-row .pickbtns{display:flex;gap:5px;flex-shrink:0;}
+.p-row button{background:var(--panel-2);border:1px solid var(--line);color:var(--cyan);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--mono);}
+.p-row button:hover:not(:disabled){background:var(--cyan);color:#04081c;}
+.p-row button:disabled{opacity:0.25;cursor:not-allowed;}
+.p-row button.p2btn{color:var(--purple);}
+.p-row button.p2btn:hover:not(:disabled){background:var(--purple);color:#0c0620;}
+.empty-hint{border:1px dashed var(--line);border-radius:12px;padding:30px 18px;text-align:center;color:var(--text-dim);font-size:13.5px;}
+.finish-hint{border:1px solid var(--green);background:rgba(51,214,166,0.08);border-radius:12px;padding:18px;text-align:center;color:var(--text);font-size:13.5px;}
+
+/* ---------- ROLL ANIMATION ---------- */
+.roll-frame{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px 16px;text-align:center;position:relative;overflow:hidden;}
+.roll-frame .rf-tag{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--text-dimmer);text-transform:uppercase;margin-bottom:12px;}
+.roll-name{font-family:var(--disp);font-size:24px;letter-spacing:0.5px;line-height:1.1;animation:rollFlick .12s ease;}
+.roll-year{font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:6px;}
+.roll-frame.locked{border-color:var(--gold);box-shadow:0 0 0 1px rgba(232,194,92,0.35), 0 12px 34px -12px rgba(232,194,92,0.5);}
+.roll-frame.locked .roll-name{color:var(--gold-bright);}
+.roll-frame.locked .rf-tag{color:var(--gold);}
+@keyframes rollFlick{from{opacity:.15;transform:translateY(9px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- PITCH & JERSEYS ---------- */
+.pitch-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;position:sticky;top:82px;}
+.pitch{position:relative;width:100%;aspect-ratio:3/3.7;border-radius:12px;overflow:hidden;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 40px, rgba(255,255,255,0.015) 40px 80px), linear-gradient(180deg,#0d3a24,#0a2b1a 60%,#0d3a24);
+  border:1px solid rgba(255,255,255,0.08);}
+.pitch svg.lines{position:absolute;inset:0;width:100%;height:100%;}
+.slot{position:absolute;transform:translate(-50%,-50%);width:86px;text-align:center;}
+.slot .shirt{position:relative;width:58px;height:51px;margin:0 auto 3px;}
+.slot .shirt svg{width:100%;height:100%;display:block;overflow:visible;}
+.slot .shirt path{fill:rgba(10,18,48,0.78);stroke:rgba(160,180,255,0.4);stroke-width:2.2;stroke-dasharray:5 4;stroke-linejoin:round;}
+.slot .shirt .lbl{position:absolute;left:0;right:0;top:47%;transform:translateY(-50%);font-family:var(--mono);font-size:13px;color:var(--text-dimmer);font-weight:700;letter-spacing:0.5px;}
+.slot.filled .shirt path{fill:#1c2a5e;stroke:var(--cyan);stroke-dasharray:none;}
+.slot.filled .shirt .lbl{color:#e5edff;font-size:13.5px;}
+.slot.filled.legend .shirt{filter:drop-shadow(0 0 6px rgba(232,194,92,0.6));}
+.slot.filled.legend .shirt path{stroke:var(--gold);stroke-width:2.6;}
+.slot.filled.legend .shirt .lbl{color:var(--gold-bright);}
+.slot.filled{cursor:pointer;}
+.slot.selected .shirt{filter:drop-shadow(0 0 9px rgba(255,255,255,0.75));}
+.slot.selected .shirt path{stroke:#ffffff;}
+.slot.target{cursor:pointer;}
+.slot.target .shirt{animation:targetPulse 0.9s infinite;}
+.slot.target .shirt path{stroke:var(--gold-bright);stroke-dasharray:none;fill:rgba(232,194,92,0.16);}
+.slot.target .shirt .lbl{color:var(--gold-bright);}
+@keyframes targetPulse{0%,100%{filter:drop-shadow(0 0 2px rgba(245,217,122,0.7));}50%{filter:drop-shadow(0 0 10px rgba(245,217,122,1));}}
+.slot .name{font-size:11.5px;color:var(--text-dim);line-height:1.15;max-width:86px;margin:0 auto;font-weight:600;}
+.slot.filled .name{color:var(--text);font-weight:600;}
+.pitch-hint{font-size:11px;color:var(--text-dimmer);text-align:center;margin-top:10px;}
+.move-bar{margin-top:10px;background:var(--panel-2);border:1px solid var(--gold);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;animation:fadeUp .2s ease;}
+.move-bar b{color:var(--gold);}
+.move-bar .mb-note{color:var(--text-dim);flex:1;min-width:160px;}
+.move-bar button{flex-shrink:0;}
+
+/* ---------- MATCH / TOURNAMENT ---------- */
+.rules-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;}
+.rules-card h3{font-size:19px;text-transform:uppercase;margin-bottom:6px;}
+.rules-card .vs{font-family:var(--mono);font-size:13px;color:var(--text-dim);margin:10px 0;}
+.rules-card .vs b{color:var(--gold);}
+.rules-card ul{margin:10px 0 0;padding-left:18px;color:var(--text-dim);font-size:13px;line-height:1.7;}
+
+.live-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin-bottom:20px;}
+.live-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.live-clock{font-family:var(--mono);font-size:13px;color:var(--cyan);display:flex;align-items:center;gap:8px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1s infinite;}
+.live-score{display:flex;align-items:center;justify-content:center;gap:22px;margin:10px 0 20px;}
+.live-team{font-size:16px;font-weight:800;text-align:center;flex:1;}
+.live-num{font-family:var(--mono);font-size:46px;color:var(--gold);min-width:110px;text-align:center;}
+.progress-track{height:8px;border-radius:99px;background:var(--panel-2);overflow:hidden;margin-bottom:18px;}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--blue-bright),var(--cyan));transition:width .1s linear;}
+.feed{max-height:200px;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:8px;}
+.feed-item{display:flex;gap:10px;align-items:center;font-size:13px;padding:8px 12px;border-radius:9px;background:var(--panel-2);animation:fadeUp .3s ease;}
+.feed-item .fmin{font-family:var(--mono);color:var(--cyan);width:38px;flex-shrink:0;}
+.feed-item.opp .fmin{color:var(--red);}
+.feed-item b{color:var(--gold);}
+.pens-grid{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.pen-kick{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--panel-2);border:1px solid var(--line);}
+.pen-kick.made{background:rgba(51,214,166,0.18);border-color:var(--green);}
+.pen-kick.miss{background:rgba(255,93,108,0.18);border-color:var(--red);}
+
+.final-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:20px;animation:fadeUp .4s ease;}
+.final-card .fc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.fc-result{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:999px;letter-spacing:1px;}
+.fc-result.W{background:rgba(51,214,166,0.15);color:var(--green);}
+.fc-result.D{background:rgba(232,194,92,0.15);color:var(--gold);}
+.fc-result.L{background:rgba(255,93,108,0.15);color:var(--red);}
+.fc-goals{margin-top:12px;padding-top:12px;border-top:1px solid var(--line-soft);font-size:12px;color:var(--text-dim);display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--mono);}
+.fc-goals b{color:var(--text);font-family:var(--body);font-weight:700;}
+.continue-row{display:flex;justify-content:center;margin-top:6px;}
+
+.table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:20px 0;}
+.table-wrap .tw-title{padding:12px 14px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--line);background:var(--bg-2);}
+.table-scroll{max-height:380px;overflow-y:auto;}
+table.lg{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.lg th{text-align:left;padding:9px 10px;font-family:var(--mono);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--line);background:var(--bg-2);position:sticky;top:0;}
+table.lg td{padding:8px 10px;border-bottom:1px solid var(--line-soft);color:var(--text-dim);}
+table.lg tr.me td{color:var(--text);font-weight:800;background:rgba(232,194,92,0.08);}
+table.lg tr.me td:first-child{color:var(--gold);}
+table.lg td.zone-r16{box-shadow:inset 3px 0 0 var(--green);}
+table.lg td.zone-po{box-shadow:inset 3px 0 0 var(--gold);}
+table.lg td.zone-out{box-shadow:inset 3px 0 0 var(--red);}
+.legend-row{display:flex;gap:16px;padding:11px 14px;font-size:10.5px;color:var(--text-dim);flex-wrap:wrap;border-top:1px solid var(--line-soft);}
+.legend-row span{display:flex;align-items:center;gap:6px;}
+.legend-row i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+
+/* ---------- KNOCKOUT BRACKET ---------- */
+.bracket-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:0 0 20px;overflow-x:auto;}
+.bracket-wrap .tw-title{padding:0 0 12px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);}
+.bracket{display:flex;gap:14px;min-width:820px;align-items:stretch;}
+.b-col{flex:1;display:flex;flex-direction:column;}
+.b-col h5{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--text-dimmer);text-transform:uppercase;text-align:center;margin:0 0 8px;font-weight:500;}
+.b-matches{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:8px;}
+.b-match{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:6px 9px;font-size:11px;}
+.b-match.mine{border-color:var(--gold);box-shadow:0 0 0 1px rgba(232,194,92,0.3);}
+.b-row{display:flex;justify-content:space-between;gap:8px;padding:2.5px 0;color:var(--text-dim);}
+.b-row .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
+.b-row .bs{font-family:var(--mono);flex-shrink:0;}
+.b-row.win{color:var(--text);font-weight:700;}
+.b-row.meRow .bn{color:var(--gold);font-weight:800;}
+.b-pen{font-family:var(--mono);font-size:9px;color:var(--text-dimmer);text-align:right;margin-top:2px;}
+
+.trophy-screen{text-align:center;padding:50px 20px;background:radial-gradient(ellipse at 50% 0%, rgba(232,194,92,0.12), transparent 60%);border-radius:var(--radius);border:1px solid var(--line);}
+.trophy-screen h2{font-size:clamp(28px,5vw,48px);text-transform:uppercase;}
+.trophy-screen.out h2{color:var(--text-dim);}
+.badge-perfect{display:inline-flex;align-items:center;gap:10px;margin-top:16px;padding:10px 20px;border-radius:999px;background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#241a04;font-weight:800;font-size:12.5px;letter-spacing:0.5px;text-transform:uppercase;}
+.trophy-stats{display:flex;justify-content:center;gap:30px;margin:26px 0;flex-wrap:wrap;}
+.trophy-stats div b{font-family:var(--mono);font-size:26px;color:var(--gold);display:block;}
+.trophy-stats div span{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
+
+.hidden{display:none !important;}
+::-webkit-scrollbar{height:8px;width:8px;}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo"><a href="index.html">
+      <svg class="starball spin-slow" width="24" height="24" viewBox="0 0 100 100" style="color:var(--cyan);display:inline-block;vertical-align:middle;margin-right:8px;"><path d="M50 4 L58 38 L94 42 L64 58 L74 92 L50 70 L26 92 L36 58 L6 42 L42 38 Z"/></svg>
+      UEFA XI <small>⭐ EFSANELER FANTEZİ LİGİ</small>
+    </a></div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-dimmer);" id="navPhase">DRAFT AŞAMASI</div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- DRAFT VIEW -->
+  <div id="draftView">
+    <div class="section-head">
+      <div class="eyebrow">01 · DRAFT</div>
+      <h2>Kadronu Çek, On Biri Doldur</h2>
+      <p>Zar at — çark dönsün, karşına <b>tek bir kadro</b> çıksın. Havuzda <b>1967'den bugüne</b> Avrupa kupalarına katılmış 56 gerçek kadro var: efsane finalistler artık daha nadir, tarihi kadrolar ve sürpriz katılımcılar daha sık geliyor. Oyuncuyu seçtikten sonra bile fikrini değiştirebilirsin: sahadaki formasına tıkla, ikincil mevkisi ışıklansın, oraya taşı. Kadroyu beğenmezsen 3 hakkını iki yoldan kullan: <b>aynı takımın farklı yılı</b> ya da <b>aynı yılın farklı takımı</b>. Draft'a başladıktan sonra sıfırlama yok — seçimlerinle yaşamayı öğren.</p>
+    </div>
+
+    <div class="draft-grid2">
+      <div class="draft-left">
+        <div class="control-card">
+          <h4>Formasyon</h4>
+          <div class="chip-row" id="formationChips"></div>
+          <h4>Oyun Stili</h4>
+          <div class="chip-row" id="styleChips"></div>
+        </div>
+
+        <div class="control-card">
+          <div class="rating-box">
+            <div class="num" id="ovrNum">--</div>
+            <div class="lbl">Genel Reyting</div>
+            <div class="subrating">
+              <div><span>Hücum</span><b id="atkNum" style="color:var(--cyan)">--</b></div>
+              <div><span>Savunma</span><b id="defNum" style="color:var(--green)">--</b></div>
+            </div>
+          </div>
+          <div class="swap-box">
+            <h4>Takım Değiştirme Hakkı</h4>
+            <div class="swap-dots" id="swapDots"></div>
+            <div class="swap-btn-row">
+              <button class="btn btn-ghost btn-sm btn-block" id="swapYearBtn">🔁 Aynı Takım, Farklı Yıl</button>
+              <button class="btn btn-ghost btn-sm btn-block" id="swapClubBtn">🔀 Aynı Yıl, Farklı Takım</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-card roll-area">
+          <div class="roll-head">
+            <div class="slots-counter" id="slotsCounter">0 / 11 pozisyon dolu</div>
+            <button class="btn btn-primary btn-sm" id="rollBtn">🎲 Zar At</button>
+          </div>
+          <div id="offerZone">
+            <div class="empty-hint">Kadro havuzundan bir takım çekmek için <b style="color:var(--cyan)">Zar At</b>'a bas.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pitch-panel">
+        <div class="pitch">
+          <svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none" style="opacity:0.35">
+            <line x1="0" y1="50" x2="100" y2="50" stroke="#fff" stroke-width="0.4"/>
+            <circle cx="50" cy="50" r="9" fill="none" stroke="#fff" stroke-width="0.4"/>
+            <rect x="20" y="0" width="60" height="14" fill="none" stroke="#fff" stroke-width="0.4"/>
+            <rect x="20" y="86" width="60" height="14" fill="none" stroke="#fff" stroke-width="0.4"/>
+          </svg>
+          <div id="slotsLayer"></div>
+        </div>
+        <div class="pitch-hint">Sahadaki bir oyuncuya tıkla: oynayabileceği mevkiler altın renginde ışıklanır. Boş formaya tıklarsan oraya taşınır, dolu formaya tıklarsan iki oyuncu yer değiştirir.</div>
+        <div id="moveBar" class="hidden"></div>
+      </div>
+    </div>
+
+    <div class="continue-row" style="margin-top:24px;">
+      <button class="btn btn-gold" id="startSimBtn" disabled>Şampiyonlar Ligi'ni Başlat →</button>
+    </div>
+  </div>
+
+  <!-- TOURNAMENT VIEW -->
+  <div id="tourneyView" class="hidden">
+    <div class="section-head">
+      <div class="eyebrow">02 · ŞAMPİYONLAR LİGİ</div>
+      <h2>Turnuva</h2>
+    </div>
+    <div class="tree-bar" id="treeBar"></div>
+    <div id="stageContent"></div>
+  </div>
+
+</main>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const POS_FULL = {GK:'Kaleci',CB:'Stoper',LB:'Sol Bek',RB:'Sağ Bek',LWB:'Sol Kanat Bek',RWB:'Sağ Kanat Bek',
+  CDM:'Ön Libero',CM:'Merkez Orta Saha',CAM:'On Numara',LM:'Sol Orta Saha',RM:'Sağ Orta Saha',
+  LW:'Sol Kanat',RW:'Sağ Kanat',ST:'Santrfor',CF:'Golcü'};
+
+// [name, pos, rating, legend, pos2(optional)]
+// club tuple: [clubName, year, tier('elite'|'mid'|'weak'), players[]]
+const RAW_CLUBS = [
+["Manchester United","1999","elite",[["Peter Schmeichel","GK",93,1],["Gary Neville","RB",86,0],["Jaap Stam","CB",92,1],["Ronny Johnsen","CB",83,0],["Denis Irwin","LB",85,0],["David Beckham","RW",92,1,"CM"],["Roy Keane","CM",93,1],["Nicky Butt","CDM",82,0],["Ryan Giggs","LW",91,1,"RW"],["Dwight Yorke","ST",89,1],["Andy Cole","ST",87,0],["Ole Gunnar Solskjær","ST",85,1,"RW"]]],
+["Bayern Munich","1999","elite",[["Oliver Kahn","GK",93,1],["Markus Babbel","RB",82,0],["Samuel Kuffour","CB",81,0],["Thomas Linke","CB",80,0],["Bixente Lizarazu","LB",87,1],["Stefan Effenberg","CM",89,1],["Jens Jeremies","CDM",81,0],["Mehmet Scholl","CAM",85,0,"RW"],["Mario Basler","RW",83,0,"CAM"],["Carsten Jancker","ST",82,0],["Alexander Zickler","ST",80,0],["Thomas Strunz","CM",78,0]]],
+["Porto","2004","elite",[["Vítor Baía","GK",87,1],["Paulo Ferreira","RB",83,0],["Ricardo Carvalho","CB",88,1],["Jorge Costa","CB",84,0],["Nuno Valente","LB",80,0],["Costinha","CDM",83,0],["Maniche","CM",87,1],["Deco","CAM",91,1,"CM"],["Pedro Mendes","CM",81,0],["Derlei","ST",82,0],["Benni McCarthy","ST",84,0],["Carlos Alberto","CF",81,0,"ST"]]],
+["Monaco","2004","elite",[["Flavio Roma","GK",79,0],["Hugo Ibarra","RB",78,0],["Gaël Givet","CB",80,0],["Sébastien Squillaci","CB",81,0],["Julien Rodriguez","LB",78,0],["Édouard Cissé","CDM",79,0],["Lucas Bernardi","CM",78,0],["Ludovic Giuly","RW",86,1,"LW"],["Jérôme Rothen","LW",83,0],["Fernando Morientes","ST",88,1,"CF"],["Dado Pršo","ST",82,0],["Akis Zikos","CM",77,0]]],
+["Liverpool","2005","elite",[["Jerzy Dudek","GK",82,0],["Steve Finnan","RB",80,0],["Jamie Carragher","CB",88,1],["Sami Hyypiä","CB",86,1],["Djimi Traoré","LB",76,0],["Xabi Alonso","CM",90,1],["Steven Gerrard","CAM",95,1,"CM"],["Luis García","CF",82,0],["Harry Kewell","LW",80,0,"RW"],["Milan Baroš","ST",79,0],["Djibril Cissé","ST",80,0],["Vladimír Šmicer","RW",78,1,"LW"]]],
+["AC Milan","2005","elite",[["Dida","GK",86,0],["Cafu","RB",89,1,"RM"],["Alessandro Nesta","CB",92,1],["Jaap Stam","CB",89,1],["Paolo Maldini","LB",94,1],["Gennaro Gattuso","CDM",88,1],["Andrea Pirlo","CM",94,1],["Clarence Seedorf","CAM",88,1,"CM"],["Kaká","CAM",92,1,"RW"],["Hernán Crespo","ST",89,1],["Andriy Shevchenko","ST",93,1,"LW"],["Serginho","LW",80,0]]],
+["AC Milan","2007","elite",[["Dida","GK",86,0],["Cafu","RB",89,1,"RM"],["Alessandro Nesta","CB",92,1],["Paolo Maldini","CB",94,1],["Massimo Oddo","LB",82,0],["Massimo Ambrosini","CDM",82,0],["Andrea Pirlo","CM",94,1],["Gennaro Gattuso","CDM",88,1],["Kaká","CAM",94,1,"RW"],["Clarence Seedorf","CAM",88,1,"CM"],["Filippo Inzaghi","ST",89,1,"CF"],["Alberto Gilardino","ST",82,0]]],
+["Liverpool","2007","elite",[["Pepe Reina","GK",87,1],["Steve Finnan","RB",81,0],["Jamie Carragher","CB",88,1],["Daniel Agger","CB",84,0],["Álvaro Arbeloa","LB",82,0],["Javier Mascherano","CDM",87,1],["Xabi Alonso","CM",90,1],["Steven Gerrard","CAM",94,1,"CM"],["Dirk Kuyt","RW",83,0,"ST"],["Peter Crouch","ST",82,0],["Craig Bellamy","LW",81,0],["John Arne Riise","LM",82,0,"LB"]]],
+["Barcelona","2009","elite",[["Víctor Valdés","GK",87,0],["Dani Alves","RB",90,1],["Gerard Piqué","CB",90,1],["Carles Puyol","CB",91,1],["Éric Abidal","LB",84,0],["Sergio Busquets","CDM",87,0],["Xavi","CM",95,1],["Andrés Iniesta","LW",95,1,"CM"],["Yaya Touré","CM",87,0],["Samuel Eto'o","RW",92,1,"ST"],["Lionel Messi","CF",97,1,"RW"],["Thierry Henry","LW",91,1,"ST"]]],
+["Manchester United","2009","elite",[["Edwin van der Sar","GK",90,1],["Gary Neville","RB",84,0],["Rio Ferdinand","CB",90,1],["Nemanja Vidić","CB",91,1],["Patrice Evra","LB",88,1],["Michael Carrick","CM",85,0],["Anderson","CM",81,0],["Ryan Giggs","LW",89,1,"CM"],["Cristiano Ronaldo","RW",96,1,"LW"],["Wayne Rooney","ST",92,1],["Carlos Tévez","ST",88,1],["Park Ji-sung","RM",80,0,"LM"]]],
+["Real Madrid","2014","elite",[["Iker Casillas","GK",90,1],["Dani Carvajal","RB",85,0],["Sergio Ramos","CB",93,1],["Pepe","CB",87,0],["Marcelo","LB",90,1],["Luka Modrić","CM",92,1,"CDM"],["Ángel Di María","LW",89,1,"RW"],["Xabi Alonso","CDM",88,1],["Isco","CAM",85,0,"CM"],["Karim Benzema","ST",91,1],["Cristiano Ronaldo","ST",97,1,"LW"],["Gareth Bale","RW",90,1,"ST"]]],
+["Atlético Madrid","2014","elite",[["Thibaut Courtois","GK",89,1],["Juanfran","RB",82,0],["Diego Godín","CB",90,1],["Miranda","CB",86,0],["Filipe Luís","LB",85,0],["Gabi","CDM",83,0],["Tiago","CM",84,0],["Koke","CM",87,1,"CDM"],["Arda Turan","RW",85,0,"LW"],["Diego Costa","ST",88,1],["David Villa","ST",88,1],["Raúl García","CM",80,0]]],
+["Real Madrid","2018","elite",[["Keylor Navas","GK",87,0],["Dani Carvajal","RB",87,0],["Sergio Ramos","CB",94,1],["Raphaël Varane","CB",87,0],["Marcelo","LB",90,1],["Casemiro","CDM",89,1],["Luka Modrić","CM",95,1,"CDM"],["Toni Kroos","CM",91,1,"CDM"],["Isco","CAM",85,0,"CM"],["Karim Benzema","ST",89,0],["Cristiano Ronaldo","ST",98,1,"LW"],["Gareth Bale","RW",87,1,"ST"]]],
+["Liverpool","2018","elite",[["Loris Karius","GK",76,0],["Trent Alexander-Arnold","RB",87,1],["Dejan Lovren","CB",80,0],["Virgil van Dijk","CB",93,1],["Andrew Robertson","LB",87,1],["Jordan Henderson","CM",85,1,"CDM"],["Georginio Wijnaldum","CM",84,0],["James Milner","LM",81,0,"CM"],["Mohamed Salah","RW",92,1,"ST"],["Roberto Firmino","CF",87,1,"ST"],["Sadio Mané","LW",90,1,"ST"],["Emre Can","CDM",82,0]]],
+["Liverpool","2019","elite",[["Alisson","GK",91,1],["Trent Alexander-Arnold","RB",88,1],["Virgil van Dijk","CB",95,1],["Joel Matip","CB",83,0],["Andrew Robertson","LB",88,1],["Fabinho","CDM",87,0],["Jordan Henderson","CM",86,1,"CDM"],["Georginio Wijnaldum","CM",85,0],["James Milner","RM",82,0,"CM"],["Mohamed Salah","RW",93,1,"ST"],["Sadio Mané","LW",92,1,"ST"],["Roberto Firmino","CF",88,1,"ST"]]],
+["Tottenham Hotspur","2019","elite",[["Hugo Lloris","GK",87,1],["Kieran Trippier","RB",84,0],["Toby Alderweireld","CB",85,0],["Jan Vertonghen","CB",85,0],["Danny Rose","LB",81,0],["Moussa Sissoko","CM",79,0],["Harry Winks","CDM",78,0],["Christian Eriksen","CAM",89,1,"CM"],["Son Heung-min","LW",89,1,"ST"],["Harry Kane","ST",92,1,"CF"],["Lucas Moura","RW",82,0,"LW"],["Dele Alli","CAM",84,0,"CM"]]],
+["Manchester City","2023","elite",[["Ederson","GK",89,1],["Kyle Walker","RB",86,0],["Rúben Dias","CB",91,1],["John Stones","CB",85,0],["Nathan Aké","LB",82,0],["Rodri","CDM",91,1],["İlkay Gündoğan","CM",89,1,"CAM"],["Kevin De Bruyne","CAM",96,1,"CM"],["Bernardo Silva","RW",90,1,"CM"],["Erling Haaland","ST",95,1],["Julián Álvarez","CF",86,0,"ST"],["Jack Grealish","LW",85,0,"RW"]]],
+["Inter Milan","2023","elite",[["André Onana","GK",84,0],["Denzel Dumfries","RB",84,0],["Milan Škriniar","CB",87,1],["Francesco Acerbi","CB",83,0],["Federico Dimarco","LB",83,0],["Nicolò Barella","CM",87,1,"CDM"],["Hakan Çalhanoğlu","CDM",85,0,"CM"],["Marcelo Brozović","CM",86,0,"CDM"],["Robin Gosens","LM",79,0,"LB"],["Lautaro Martínez","ST",89,1],["Edin Džeko","ST",84,0],["Romelu Lukaku","ST",86,0,"CF"]]],
+
+["Ajax","1995","elite",[["Edwin van der Sar","GK",88,1],["Michael Reiziger","RB",84,0],["Danny Blind","CB",87,1],["Frank de Boer","CB",86,0,"LB"],["Frank Rijkaard","CDM",90,1,"CB"],["Edgar Davids","CM",88,1,"CDM"],["Clarence Seedorf","CM",85,0,"CAM"],["Jari Litmanen","CAM",91,1,"ST"],["Finidi George","RW",84,0],["Marc Overmars","LW",88,1,"RW"],["Patrick Kluivert","ST",86,1,"CF"],["Ronald de Boer","CM",83,0,"ST"]]],
+["Juventus","1996","elite",[["Angelo Peruzzi","GK",89,1],["Moreno Torricelli","RB",80,0],["Ciro Ferrara","CB",88,1],["Pietro Vierchowod","CB",86,0],["Gianluca Pessotto","LB",81,0],["Didier Deschamps","CDM",88,1],["Paulo Sousa","CM",85,0,"CDM"],["Antonio Conte","CM",86,1],["Alessandro Del Piero","CAM",91,1,"LW"],["Vladimir Jugović","CM",83,0,"CAM"],["Gianluca Vialli","ST",89,1,"CF"],["Fabrizio Ravanelli","ST",87,0]]],
+["Borussia Dortmund","1997","elite",[["Stefan Klos","GK",85,0],["Stefan Reuter","RB",82,0],["Jürgen Kohler","CB",89,1],["Matthias Sammer","CB",92,1,"CDM"],["Jörg Heinrich","LB",82,0,"LM"],["Paul Lambert","CDM",83,0],["Paulo Sousa","CM",84,0],["Andreas Möller","CAM",89,1,"CM"],["Lars Ricken","CAM",82,0,"ST"],["Stéphane Chapuisat","ST",86,0,"CF"],["Karl-Heinz Riedle","ST",87,1],["René Tretschok","CM",78,0,"LM"]]],
+["Real Madrid","2002","elite",[["Iker Casillas","GK",88,1],["Míchel Salgado","RB",84,0],["Fernando Hierro","CB",90,1,"CDM"],["Iván Helguera","CB",85,0,"CDM"],["Roberto Carlos","LB",92,1,"LW"],["Claude Makélélé","CDM",89,1],["Zinedine Zidane","CAM",97,1,"CM"],["Luís Figo","RW",93,1,"CAM"],["Steve McManaman","CM",84,0,"RW"],["Santiago Solari","LW",83,0],["Raúl","ST",93,1,"CF"],["Fernando Morientes","ST",87,0]]],
+["Inter Milan","2010","elite",[["Júlio César","GK",90,1],["Maicon","RB",90,1],["Lúcio","CB",89,1],["Walter Samuel","CB",88,1],["Cristian Chivu","LB",83,0,"CB"],["Javier Zanetti","CM",89,1,"RB"],["Esteban Cambiasso","CDM",88,1],["Wesley Sneijder","CAM",92,1],["Samuel Eto'o","RW",90,1,"ST"],["Goran Pandev","LW",82,0],["Diego Milito","ST",91,1,"CF"],["Thiago Motta","CDM",84,0,"CM"]]],
+["Barcelona","2011","elite",[["Víctor Valdés","GK",88,0],["Dani Alves","RB",91,1],["Gerard Piqué","CB",91,1],["Javier Mascherano","CB",88,1,"CDM"],["Éric Abidal","LB",85,0,"CB"],["Sergio Busquets","CDM",91,1],["Xavi","CM",96,1],["Andrés Iniesta","CM",95,1,"CAM"],["Pedro","RW",86,0,"LW"],["Lionel Messi","CF",98,1,"RW"],["David Villa","LW",90,1,"ST"],["Seydou Keita","CM",82,0,"CDM"]]],
+["Chelsea","2012","elite",[["Petr Čech","GK",91,1],["Branislav Ivanović","RB",85,0,"CB"],["John Terry","CB",88,1],["Gary Cahill","CB",84,0],["Ashley Cole","LB",89,1],["John Obi Mikel","CDM",82,0],["Frank Lampard","CM",89,1,"CAM"],["Juan Mata","CAM",87,0,"RW"],["Ramires","RM",84,0,"CM"],["Salomon Kalou","RW",80,0,"LW"],["Didier Drogba","ST",92,1,"CF"],["Fernando Torres","ST",84,0]]],
+["Bayern Munich","2013","elite",[["Manuel Neuer","GK",93,1],["Philipp Lahm","RB",92,1,"CDM"],["Dante","CB",85,0],["Jérôme Boateng","CB",86,0],["David Alaba","LB",87,1,"CB"],["Javi Martínez","CDM",88,0,"CB"],["Bastian Schweinsteiger","CM",91,1,"CDM"],["Thomas Müller","CAM",90,1,"ST"],["Arjen Robben","RW",92,1],["Franck Ribéry","LW",93,1],["Mario Mandžukić","ST",87,0,"CF"],["Mario Gómez","ST",85,0]]],
+["Real Madrid","2022","elite",[["Thibaut Courtois","GK",93,1],["Dani Carvajal","RB",85,0],["Éder Militão","CB",86,0],["David Alaba","CB",87,1,"LB"],["Ferland Mendy","LB",84,0],["Casemiro","CDM",90,1],["Luka Modrić","CM",93,1,"CAM"],["Toni Kroos","CM",90,1,"CDM"],["Federico Valverde","RW",87,0,"CM"],["Vinícius Júnior","LW",92,1,"ST"],["Karim Benzema","ST",95,1,"CF"],["Rodrygo","RW",85,0,"ST"]]],
+["Nottingham Forest","1979","mid",[["Peter Shilton","GK",90,1],["Viv Anderson","RB",78,0],["Larry Lloyd","CB",76,0],["Kenny Burns","CB",79,1],["Frank Clark","LB",75,0],["John McGovern","CDM",74,0],["Ian Bowyer","CM",76,0],["Archie Gemmill","CM",77,0],["John Robertson","LW",84,1,"RW"],["Martin O'Neill","RM",77,0,"RW"],["Tony Woodcock","ST",80,0],["Garry Birtles","ST",78,0]]],
+["Steaua Bucharest","1986","mid",[["Helmuth Duckadam","GK",88,1],["I. Radu","RB",72,0],["Ștefan Barbu","CB",74,0],["Adrian Bumbescu","CB",75,0],["Zahiu","LB",72,0],["Marin Majaru","CDM",73,0],["Mircea Stănescu","CM",73,0],["Anghel Iordănescu","CM",78,0,"CAM"],["Ladislau Bölöni","CAM",80,1,"CM"],["Marius Lăcătuș","RW",82,1,"LW"],["M. Balint","ST",79,0],["Victor Pițurcă","ST",81,1]]],
+["Barcelona","1986","mid",[["Andoni Zubizarreta","GK",86,1],["Ángel Pedraza","RB",76,0],["José Ramón Alexanko","CB",79,0],["Migueli","CB",80,0],["Julio Alberto","LB",78,0],["Clos","CDM",74,0],["Víctor Muñoz","CM",78,0],["Pichi Alonso","CM",73,0],["Bernd Schuster","CAM",88,1,"CM"],["Marcos Alonso","LW",77,0],["Rojo","RW",75,0],["Steve Archibald","ST",82,1,"CF"]]],
+["Celtic","1967","mid",[["Ronnie Simpson","GK",82,0],["Jim Craig","RB",78,0],["Billy McNeill","CB",86,1],["John Clark","CB",79,0],["Tommy Gemmell","LB",84,1],["Bobby Murdoch","CM",85,1,"CDM"],["Bertie Auld","CM",82,0,"CAM"],["Jimmy Johnstone","RW",89,1],["Bobby Lennox","LW",84,0,"ST"],["Stevie Chalmers","ST",83,0,"CF"],["Willie Wallace","ST",81,0],["John Hughes","LW",77,0]]],
+["Galatasaray","2001","mid",[["Cláudio Taffarel","GK",86,1],["Ümit Davala","RM",79,0,"RB"],["Bülent Korkmaz","CB",84,1],["Gheorghe Popescu","CB",85,1,"CDM"],["Capone","LB",77,0],["Suat Kaya","CDM",76,0],["Okan Buruk","CM",82,0,"CAM"],["Emre Belözoğlu","CM",83,0,"CAM"],["Gheorghe Hagi","CAM",89,1],["Hasan Şaş","LW",81,0,"RW"],["Hakan Şükür","ST",87,1,"CF"],["Mário Jardel","ST",85,0]]],
+["Valencia","2001","mid",[["Santiago Cañizares","GK",89,1],["Jocelyn Angloma","RB",82,0],["Roberto Ayala","CB",87,1],["Mauricio Pellegrino","CB",81,0],["Amedeo Carboni","LB",79,0],["David Albelda","CDM",83,0],["Rubén Baraja","CM",84,0,"CDM"],["Gaizka Mendieta","CAM",89,1,"RM"],["Pablo Aimar","CAM",86,0,"CM"],["Kily González","LW",83,0,"LM"],["John Carew","ST",80,0,"CF"],["Juan Sánchez","ST",78,0]]],
+["Bayer Leverkusen","2002","mid",[["Hans-Jörg Butt","GK",82,0],["Boris Živković","RB",76,0],["Lúcio","CB",88,1],["Carsten Ramelow","CDM",81,0,"CB"],["Diego Placente","LB",79,0],["Michael Ballack","CM",90,1,"CAM"],["Bernd Schneider","RM",84,0,"RW"],["Yıldıray Baştürk","CAM",84,0,"CM"],["Zé Roberto","LW",85,0,"LM"],["Ulf Kirsten","ST",82,0],["Oliver Neuville","ST",81,0,"CF"],["Dimitar Berbatov","ST",80,0,"CF"]]],
+["Deportivo La Coruña","2004","mid",[["José Molina","GK",80,0],["Manuel Pablo","RB",79,0],["Jorge Andrade","CB",84,0],["Noureddine Naybet","CB",82,0],["Enrique Romero","LB",78,0],["Mauro Silva","CDM",85,1],["Sergio González","CM",80,0],["Juan Carlos Valerón","CAM",87,1,"CM"],["Fran","LM",82,1,"LW"],["Víctor Sánchez","RM",78,0,"RW"],["Diego Tristán","ST",84,0,"CF"],["Walter Pandiani","ST",81,0]]],
+["Arsenal","2006","mid",[["Jens Lehmann","GK",87,0],["Emmanuel Eboué","RB",79,0],["Kolo Touré","CB",85,0],["Sol Campbell","CB",86,1],["Ashley Cole","LB",88,1],["Gilberto Silva","CDM",85,0],["Cesc Fàbregas","CM",87,0,"CAM"],["Alexander Hleb","CAM",83,0,"RW"],["Freddie Ljungberg","RM",84,0,"RW"],["Robert Pirès","LM",87,1,"LW"],["Thierry Henry","ST",95,1,"LW"],["José Antonio Reyes","LW",81,0,"ST"]]],
+["Chelsea","2008","mid",[["Petr Čech","GK",90,1],["Michael Essien","RB",85,0,"CM"],["Ricardo Carvalho","CB",88,1],["John Terry","CB",89,1],["Ashley Cole","LB",88,0],["Claude Makélélé","CDM",87,1],["Frank Lampard","CM",90,1,"CAM"],["Michael Ballack","CM",88,1,"CAM"],["Joe Cole","RW",83,0,"LW"],["Florent Malouda","LW",82,0,"LM"],["Didier Drogba","ST",91,1,"CF"],["Nicolas Anelka","ST",84,0]]],
+["Fenerbahçe","2008","mid",[["Volkan Demirel","GK",84,0],["Gökhan Gönül","RB",80,0],["Diego Lugano","CB",85,1],["Edu Dracena","CB",81,0],["Roberto Carlos","LB",86,1,"LW"],["Mehmet Aurélio","CDM",81,0],["Selçuk Şahin","CM",76,0,"CDM"],["Alex de Souza","CAM",88,1],["Colin Kâzım-Richards","RW",76,0],["Uğur Boral","LW",76,0],["Semih Şentürk","ST",80,0,"CF"],["Deivid","ST",79,0,"CAM"]]],
+["Monaco","2017","mid",[["Danijel Subašić","GK",82,0],["Djibril Sidibé","RB",81,0],["Kamil Glik","CB",83,0],["Jemerson","CB",78,0],["Benjamin Mendy","LB",83,0],["Fabinho","CDM",85,0,"RB"],["Tiémoué Bakayoko","CM",82,0,"CDM"],["João Moutinho","CM",84,0,"CAM"],["Bernardo Silva","RW",87,1,"CM"],["Thomas Lemar","LW",83,0,"CM"],["Radamel Falcao","ST",87,1,"CF"],["Kylian Mbappé","ST",89,1,"RW"]]],
+["Roma","2018","mid",[["Alisson","GK",89,1],["Alessandro Florenzi","RB",81,0,"RM"],["Kostas Manolas","CB",85,0],["Federico Fazio","CB",81,0],["Aleksandar Kolarov","LB",83,0],["Daniele De Rossi","CDM",86,1],["Kevin Strootman","CM",82,0],["Radja Nainggolan","CM",85,0,"CAM"],["Cengiz Ünder","RW",79,0],["Diego Perotti","LW",79,0],["Edin Džeko","ST",87,1,"CF"],["Patrik Schick","ST",76,0]]],
+["Ajax","2019","mid",[["André Onana","GK",84,0],["Noussair Mazraoui","RB",79,0],["Matthijs de Ligt","CB",87,1],["Daley Blind","CB",82,0,"LB"],["Nicolás Tagliafico","LB",82,0],["Lasse Schöne","CDM",79,0,"CM"],["Frenkie de Jong","CM",88,1,"CDM"],["Donny van de Beek","CM",82,0,"CAM"],["Hakim Ziyech","RW",86,0,"CAM"],["David Neres","LW",81,0,"RW"],["Dušan Tadić","CF",87,1,"LW"],["Kasper Dolberg","ST",78,0]]],
+["Atalanta","2020","mid",[["Pierluigi Gollini","GK",78,0],["Hans Hateboer","RWB",78,0,"RB"],["Rafael Tolói","CB",80,0],["José Luis Palomino","CB",78,0],["Berat Djimsiti","CB",77,0],["Robin Gosens","LWB",82,0,"LB"],["Marten de Roon","CDM",80,0,"CM"],["Remo Freuler","CM",80,0,"CDM"],["Papu Gómez","CAM",86,1,"LW"],["Josip Iličić","CAM",85,1,"RW"],["Duván Zapata","ST",84,0,"CF"],["Luis Muriel","ST",81,0]]],
+["Malmö FF","1979","weak",[["Jan Möller","GK",70,0],["Roy Andersson","RB",65,0],["Roland Andersson","CB",67,0],["Kent Jönsson","CB",64,0],["Ingemar Erlandsson","CDM",68,0,"CB"],["Staffan Tapper","CM",67,0],["Robert Prytz","CM",70,1,"CAM"],["Anders Ljungberg","CM",66,0],["Tore Cervin","LW",65,0],["Jan-Olov Kinnvall","RW",64,0],["Tommy Hansson","ST",66,0],["Bo Larsson","ST",72,1,"CM"]]],
+["Galatasaray","1994","weak",[["Hayrettin Demirbaş","GK",70,0],["Hamza Hamzaoğlu","RM",67,0,"RB"],["Reinhard Stumpf","CB",69,0],["Bülent Korkmaz","CB",76,1],["Yusuf Altıntaş","LB",65,0],["Tugay Kerimoğlu","CM",75,0,"CDM"],["Suat Kaya","CDM",68,0],["Okan Buruk","CM",68,0,"CAM"],["Uğur Tütüneker","RW",70,0],["Arif Erdem","ST",72,0,"RW"],["Kubilay Türkyılmaz","ST",74,1],["Hakan Şükür","ST",76,1,"CF"]]],
+["Anderlecht","1994","weak",[["Filip De Wilde","GK",70,0],["Bertrand Crasson","RB",66,0],["Philippe Albert","CB",74,1],["Michel De Wolf","CB",67,0],["Danny Boffin","LM",68,0,"LB"],["Johan Walem","CM",66,0,"CDM"],["Marc Emmers","CM",66,0],["Pär Zetterberg","CAM",72,0,"CM"],["Marc Degryse","CAM",73,1,"ST"],["Nii Lamptey","RW",67,0],["Luc Nilis","ST",75,1,"CF"],["Rudy Smidts","LB",64,0]]],
+["Rosenborg","1997","weak",[["Jørn Jamtfall","GK",68,0],["Vegard Heggem","RB",72,0,"RW"],["Erik Hoftun","CB",71,0],["Bjørn Otto Bragstad","CB",70,0],["Ståle Stensaas","LB",68,0],["Bent Skammelsrud","CDM",71,0,"CM"],["Roar Strand","CM",72,0,"RM"],["Ørjan Berg","CAM",70,0,"CM"],["Jahn Ivar Jakobsen","LW",69,0],["Harald Brattbakk","ST",74,1,"CF"],["Sigurd Rushfeldt","ST",71,0],["Trond Egil Soltvedt","CM",66,0]]],
+["Dinamo Zagreb","1999","weak",[["Dražen Ladić","GK",74,1],["Tomislav Rukavina","RB",66,0],["Dario Šimić","CB",74,0,"RB"],["Robert Kovač","CB",72,0],["Goran Jurić","CB",65,0,"LB"],["Krunoslav Jurčić","CDM",67,0],["Silvio Marić","CAM",72,0,"CM"],["Robert Prosinečki","CM",76,1,"CAM"],["Edin Mujčin","CM",66,0],["Mihael Mikić","RW",67,0],["Mark Viduka","ST",75,1,"CF"],["Igor Cvitanović","ST",70,0]]],
+["APOEL Nicosia","2012","weak",[["Dionisis Chiotis","GK",74,1],["Mário Sérgio","RB",66,0],["Paulo Jorge","CB",70,0],["Carlão","CB",69,0],["Marios Antoniades","LB",63,0],["Nuno Morais","CDM",71,0,"CB"],["Hélio Pinto","CM",70,0],["Marcinho","LM",68,0,"LW"],["Konstantinos Charalambidis","RW",69,0],["Gustavo Manduca","LW",72,0,"CAM"],["Ivan Tričkovski","ST",71,0,"RW"],["Aílton","ST",73,1]]],
+["BATE Borisov","2012","weak",[["Andrey Gorbunov","GK",68,0],["Denis Polyakov","RB",66,0],["Marko Simić","CB",67,0],["Yegor Filipenko","CB",66,0],["Maksim Bordachev","LB",66,0],["Edgar Olekhnovich","CDM",66,0],["Pavel Nekhaychik","CM",70,0,"LM"],["Aleksandr Hleb","CAM",76,1,"RW"],["Renan Bressan","CAM",73,0,"CM"],["Aleksandr Pavlov","RM",65,0],["Vitali Rodionov","ST",72,1,"CF"],["Dzmitry Baha","CM",64,0]]],
+["Viktoria Plzeň","2013","weak",[["Matúš Kozáčik","GK",70,0],["František Rajtoral","RB",68,0],["Roman Hubník","CB",69,0],["Marián Čišovský","CB",68,0],["David Limberský","LB",69,0],["Pavel Horváth","CM",73,1,"CAM"],["Vladimír Darida","CM",71,0,"CDM"],["Daniel Kolář","CAM",70,0],["Milan Petržela","RW",69,0],["Václav Pilař","LW",70,0],["Marek Bakoš","ST",69,0,"CF"],["Stanislav Tecl","ST",66,0]]],
+["Ludogorets","2014","weak",[["Vladislav Stoyanov","GK",72,0],["Junior Caiçara","RB",68,0],["Cosmin Moți","CB",72,1],["Georgi Terziev","CB",67,0],["Yordan Minev","LB",65,0],["Svetoslav Dyakov","CDM",69,0],["Fábio Espinho","CM",68,0,"CAM"],["Mihail Aleksandrov","CM",68,0,"LM"],["Marcelinho","CAM",73,0,"RW"],["Virgil Misidjan","LW",71,0],["Roman Bezjak","ST",70,0,"CF"],["Juninho Quixadá","RW",68,0]]],
+["Astana","2015","weak",[["Nenad Erić","GK",68,0],["Igor Shitov","RB",64,0],["Yuri Logvinenko","CB",68,0],["Marin Aničić","CB",67,0],["Dmitri Shomko","LB",66,0],["Roger Cañas","CDM",68,0],["Georgi Zhukov","CM",66,0],["Nemanja Maksimović","CM",70,0,"CAM"],["Foxi Kéthévoama","RW",71,1,"CAM"],["Baurzhan Dzholchiyev","LW",65,0],["Junior Kabananga","ST",70,0,"LW"],["Patrick Twumasi","ST",71,0,"RW"]]],
+["Qarabağ","2017","weak",[["İbrahim Šehić","GK",68,0],["Maksim Medvedev","RB",66,0],["Rashad Sadygov","CB",69,1],["Badavi Guseynov","CB",65,0],["Ansi Agolli","LB",66,0],["Gara Garayev","CDM",66,0],["Michel","CM",68,0,"CDM"],["Richard Almeida","CAM",68,0,"CM"],["Pedro Henrique","RW",69,0],["Mahir Madatov","LW",66,0],["Dino Ndlovu","ST",68,0,"CF"],["Afran İsmayılov","CM",63,0,"LW"]]],
+["Young Boys","2018","weak",[["David von Ballmoos","GK",68,0],["Kevin Mbabu","RB",72,0],["Steve von Bergen","CB",69,1],["Grégory Wüthrich","CB",64,0],["Loris Benito","LB",68,0],["Sékou Sanogo","CDM",68,0],["Djibril Sow","CM",70,0,"CDM"],["Christian Fassnacht","RW",69,0,"CM"],["Miralem Sulejmani","LW",70,0,"CAM"],["Moumi Ngamaleu","RW",67,0,"LW"],["Guillaume Hoarau","ST",73,1,"CF"],["Roger Assalé","ST",69,0]]],
+["Sheriff Tiraspol","2021","weak",[["Georgios Athanasiadis","GK",72,1],["Fernando Costanza","RB",66,0],["Gustavo Dulanto","CB",70,0],["Stjepan Radeljić","CB",67,0],["Patrick Kpozo","LB",67,0],["Edmund Addo","CDM",70,0],["Dimitris Kolovos","CM",68,0,"CAM"],["Sébastien Thill","CAM",74,1,"CM"],["Frank Castañeda","LW",71,0],["Adama Traoré","ST",71,0],["Momo Yansané","ST",69,0,"RW"],["Cedric Badolo","CM",67,0]]],
+["Maccabi Haifa","2022","weak",[["Josh Cohen","GK",70,0],["Sun Menachem","RB",64,0],["Bogdan Planić","CB",66,0],["Sean Goldberg","CB",64,0],["Pierre Cornud","LB",66,0],["Neta Lavi","CDM",67,0],["Ali Mohamed","CM",66,0,"CDM"],["Tjaronn Chery","CAM",72,1],["Omer Atzili","RW",71,0,"LW"],["Dolev Haziza","LW",67,0],["Frantzdy Pierrot","ST",70,0,"CF"],["Mahmoud Jaber","CM",63,0]]]
+];
+
+const CLUBS = RAW_CLUBS.map((c,i)=>({
+  id:i, name:c[0], year:c[1], tier:c[2],
+  players: c[3].map((p,j)=>({id:i+'-'+j, n:p[0], pos:p[1], r:p[2], leg:!!p[3], pos2:p[4]||null, taken:false}))
+}));
+
+/* Real clubs used as league-phase & knockout opponents */
+const OPP_POOL = [
+["Paris Saint-Germain",90],["Bayern Münih",91],["Real Madrid",92],["Barcelona",88],["Manchester City",91],
+["Liverpool",89],["Arsenal",89],["Inter",87],["Atlético Madrid",86],["Borussia Dortmund",85],
+["Juventus",85],["Milan",85],["Napoli",85],["Bayer Leverkusen",84],["Chelsea",84],
+["Newcastle United",81],["Aston Villa",82],["Tottenham",82],["Benfica",83],["Porto",82],
+["Sporting CP",82],["PSV",80],["Feyenoord",79],["Ajax",79],["Sevilla",79],
+["Athletic Bilbao",80],["Villarreal",79],["Girona",77],["Lille",78],["Marsilya",79],
+["Monaco",80],["Leipzig",82],["Eintracht Frankfurt",78],["Şahtar Donetsk",76],["Club Brugge",76],
+["Celtic",77],["Galatasaray",80],["Fenerbahçe",77],["Olympiakos",76],["Kızılyıldız",73],
+["Salzburg",75],["Kopenhag",72],["Sparta Prag",73],["Slavia Prag",74],["Sturm Graz",70],["Bologna",78]
+];
+
+/* ---- formation fixed slots + style-dependent central MF slots (tag, x, y) ---- */
+const FORMATIONS_FIXED = {
+  '4-3-3': [['GK',50,93],['LB',15,72],['CB',38,76],['CB',62,76],['RB',85,72],['LW',15,20],['ST',50,16],['RW',85,20]],
+  '4-4-2': [['GK',50,93],['LB',15,72],['CB',38,76],['CB',62,76],['RB',85,72],['LM',10,48],['RM',90,48],['ST',38,18],['ST',62,18]],
+  '4-2-3-1':[['GK',50,93],['LB',15,72],['CB',38,76],['CB',62,76],['RB',85,72],['LW',15,30],['RW',85,30],['ST',50,14]],
+  '3-5-2': [['GK',50,93],['CB',25,76],['CB',50,80],['CB',75,76],['LWB',8,50],['RWB',92,50],['ST',38,18],['ST',62,18]],
+  '5-3-2': [['GK',50,93],['LWB',8,72],['CB',28,78],['CB',50,80],['CB',72,78],['RWB',92,72],['ST',38,18],['ST',62,18]],
+};
+/* The adjustable slots now carry their own coordinates per style,
+   so changing the play style physically moves the circles on the pitch. */
+const STYLE_LAYOUT = {
+  '4-3-3': {
+    'Dengeli':[['CDM',50,57],['CM',32,45],['CM',68,45]],
+    'Savunma':[['CDM',35,56],['CDM',65,56],['CM',50,43]],
+    'Hücum':[['CM',50,55],['CAM',32,37],['CAM',68,37]],
+  },
+  '4-4-2': {
+    'Dengeli':[['CM',37,50],['CM',63,50]],
+    'Savunma':[['CDM',37,56],['CDM',63,56]],
+    'Hücum':[['CAM',37,39],['CAM',63,39]],
+  },
+  '4-2-3-1': {
+    'Dengeli':[['CDM',35,56],['CDM',65,56],['CAM',50,31]],
+    'Savunma':[['CDM',30,55],['CDM',50,59],['CDM',70,55]],
+    'Hücum':[['CDM',50,58],['CAM',35,35],['CAM',65,35]],
+  },
+  '3-5-2': {
+    'Dengeli':[['CDM',35,54],['CM',50,43],['CDM',65,54]],
+    'Savunma':[['CDM',30,54],['CDM',50,58],['CDM',70,54]],
+    'Hücum':[['CM',50,54],['CAM',35,37],['CAM',65,37]],
+  },
+  '5-3-2': {
+    'Dengeli':[['CM',30,48],['CM',50,45],['CM',70,48]],
+    'Savunma':[['CDM',35,55],['CDM',65,55],['CM',50,43]],
+    'Hücum':[['CM',50,55],['CAM',35,39],['CAM',65,39]],
+  },
+};
+const STYLES = {'Dengeli':{atk:1,def:1, desc:'Standart orta saha dizilişi'},'Hücum':{atk:1.09,def:0.92, desc:'Orta saha öne itilir: on numaralar (AM)'},'Savunma':{atk:0.91,def:1.09, desc:'Ön liberolarla kalabalık, alçak blok'}};
+
+/* Strict compatibility: a slot only accepts players whose listed position
+   matches it exactly. A CAM/CM player can never fill a CDM slot, and so on.
+   The only pragmatic equivalences kept: wing-backs can be covered by
+   full-backs, wide midfielders by wingers (and vice versa), and ST<->CF. */
+const COMPAT = {
+  GK:['GK'], CB:['CB'], LB:['LB'], RB:['RB'],
+  LWB:['LWB','LB'], RWB:['RWB','RB'],
+  CDM:['CDM'], CM:['CM'], CAM:['CAM'],
+  LM:['LM','LW'], RM:['RM','RW'], LW:['LW','LM'], RW:['RW','RM'],
+  ST:['ST','CF'], CF:['CF','ST'],
+};
+function fits(slotPos, playerPos){ return COMPAT[slotPos].includes(playerPos); }
+function slotFitsPlayer(slot, pl){ return fits(slot.pos, pl.basePos) || (pl.pos2 && fits(slot.pos, pl.pos2)); }
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let state = {
+  formation:'4-3-3', style:'Dengeli',
+  slots: [], offeredClub:null, swapsLeft:3, draftStarted:false,
+  rolling:false, moveSel:null, recent:[],
+};
+
+function buildSlots(formationKey, styleKey){
+  const fixed = FORMATIONS_FIXED[formationKey].map(([pos,x,y])=>({pos,x,y,player:null}));
+  const adj = STYLE_LAYOUT[formationKey][styleKey].map(([pos,x,y])=>({pos,x,y,player:null}));
+  return [...fixed, ...adj];
+}
+function rebuildSlotsPreserving(){
+  const oldPlayers = state.slots.filter(s=>s.player).map(s=>s.player);
+  state.slots = buildSlots(state.formation, state.style);
+  state.moveSel = null;
+  oldPlayers.forEach(pl=>{
+    const slot = state.slots.find(s=>!s.player && slotFitsPlayer(s,pl));
+    if(slot){ slot.player = pl; pl.pos = slot.pos; }
+    else {
+      const src = CLUBS.flatMap(c=>c.players).find(p=>p.id===pl.id);
+      if(src) src.taken=false;
+    }
+  });
+}
+function resetSquad(){
+  CLUBS.forEach(c=>c.players.forEach(p=>p.taken=false));
+  state.slots = buildSlots(state.formation, state.style);
+  state.offeredClub = null;
+  state.swapsLeft = 3;
+  state.draftStarted = false;
+  state.rolling = false;
+  state.moveSel = null;
+  state.recent = [];
+  renderAll();
+}
+
+/* ============================================================
+   RENDER: CONTROLS
+   ============================================================ */
+function renderControls(){
+  const fWrap = document.getElementById('formationChips');
+  fWrap.innerHTML='';
+  Object.keys(FORMATIONS_FIXED).forEach(key=>{
+    const b = document.createElement('button');
+    b.className = 'chip'+(state.formation===key?' active':'');
+    b.textContent = key;
+    b.onclick = ()=>{ state.formation = key; rebuildSlotsPreserving(); renderAll(); };
+    fWrap.appendChild(b);
+  });
+  const sWrap = document.getElementById('styleChips');
+  sWrap.innerHTML='';
+  Object.keys(STYLES).forEach(key=>{
+    const b = document.createElement('button');
+    b.className='chip'+(state.style===key?' active':'');
+    b.innerHTML = `${key}<span class="sub">${STYLES[key].desc}</span>`;
+    b.onclick=()=>{ state.style=key; rebuildSlotsPreserving(); renderAll(); };
+    sWrap.appendChild(b);
+  });
+}
+
+function computeRatings(){
+  const filled = state.slots.filter(s=>s.player);
+  if(filled.length<11) return null;
+  const attackPos = ['ST','CF','LW','RW','CAM'];
+  const defPos = ['CB','LB','RB','LWB','RWB'];
+  const midPos = ['CDM','CM','LM','RM'];
+  const avg = arr=> arr.length? arr.reduce((a,b)=>a+b,0)/arr.length : 78;
+  const gk = filled.find(s=>s.pos==='GK');
+  const fw = avg(filled.filter(s=>attackPos.includes(s.pos)).map(s=>s.player.r));
+  const df = avg(filled.filter(s=>defPos.includes(s.pos)).map(s=>s.player.r));
+  const mf = avg(filled.filter(s=>midPos.includes(s.pos)).map(s=>s.player.r));
+  const style = STYLES[state.style];
+  let atk = (fw*0.6 + mf*0.3 + df*0.1) * style.atk;
+  let def = (df*0.55 + (gk?gk.player.r:78)*0.25 + mf*0.2) * style.def;
+  const ovr = atk*0.5+def*0.5;
+  return {atk:Math.round(atk), def:Math.round(def), ovr:Math.round(ovr)};
+}
+function renderRating(){
+  const r = computeRatings();
+  document.getElementById('ovrNum').textContent = r? r.ovr : '--';
+  document.getElementById('atkNum').textContent = r? r.atk : '--';
+  document.getElementById('defNum').textContent = r? r.def : '--';
+}
+function renderSwapDots(){
+  const wrap = document.getElementById('swapDots');
+  wrap.innerHTML='';
+  for(let i=0;i<3;i++){
+    const dot = document.createElement('i');
+    dot.className = i < state.swapsLeft ? 'avail' : 'used';
+    wrap.appendChild(dot);
+  }
+}
+
+/* ============================================================
+   RENDER: PITCH (jersey icons + secondary-position move mode)
+   ============================================================ */
+const SHIRT_PATH = 'M18 2 L4 10 L9 22 L15 19 L15 50 L45 50 L45 19 L51 22 L56 10 L42 2 C38 8 34 10 30 10 C26 10 22 8 18 2 Z';
+function initials(name){
+  const parts = name.split(' ');
+  return (parts[0][0]+(parts[parts.length-1][0]||'')).toUpperCase();
+}
+function movePlayerToSlot(fromIdx, toIdx){
+  const from = state.slots[fromIdx], to = state.slots[toIdx];
+  if(!from.player || to.player) return;
+  to.player = from.player;
+  to.player.pos = to.pos;
+  from.player = null;
+  state.moveSel = null;
+  renderAll();
+}
+function swapPlayers(aIdx, bIdx){
+  const a = state.slots[aIdx], b = state.slots[bIdx];
+  if(!a.player || !b.player) return;
+  const tmp = a.player;
+  a.player = b.player; a.player.pos = a.pos;
+  b.player = tmp;      b.player.pos = b.pos;
+  state.moveSel = null;
+  renderAll();
+}
+function renderPitch(){
+  const layer = document.getElementById('slotsLayer');
+  layer.innerHTML='';
+  let mover = state.moveSel!=null ? state.slots[state.moveSel] : null;
+  if(mover && !mover.player){ state.moveSel=null; mover=null; }
+  const targetIdx = new Set();
+  if(mover){
+    const moverIdx = state.moveSel;
+    state.slots.forEach((s,i)=>{
+      if(i===moverIdx) return;
+      if(!slotFitsPlayer(s, mover.player)) return;
+      if(!s.player){ targetIdx.add(i); return; }
+      // occupied: allow a swap only if the occupant also fits the mover's slot
+      if(slotFitsPlayer(mover, s.player)) targetIdx.add(i);
+    });
+  }
+  state.slots.forEach((s,i)=>{
+    const div = document.createElement('div');
+    let cls = 'slot'+(s.player?' filled':'')+(s.player&&s.player.leg?' legend':'');
+    if(state.moveSel===i) cls+=' selected';
+    if(targetIdx.has(i)) cls+=' target';
+    div.className = cls;
+    div.style.left = s.x+'%';
+    div.style.top = s.y+'%';
+    div.innerHTML = `
+      <div class="shirt">
+        <svg viewBox="0 0 60 52" xmlns="http://www.w3.org/2000/svg"><path d="${SHIRT_PATH}"/></svg>
+        <span class="lbl">${s.player? initials(s.player.n) : s.pos}</span>
+      </div>
+      <div class="name">${s.player? s.player.n.split(' ').slice(-1)[0] : POS_FULL[s.pos]}</div>`;
+    if(s.player){
+      div.title = s.player.n + (s.player.pos2? ' · '+s.player.basePos+' / '+s.player.pos2 : ' · '+s.player.basePos);
+      if(targetIdx.has(i)){
+        div.title = mover.player.n + ' ↔ ' + s.player.n + ' yer değiştir';
+        div.onclick = ()=> swapPlayers(state.moveSel, i);
+      } else {
+        div.onclick = ()=>{ state.moveSel = (state.moveSel===i? null : i); renderAll(); };
+      }
+    } else if(targetIdx.has(i)){
+      div.title = 'Buraya taşı';
+      div.onclick = ()=> movePlayerToSlot(state.moveSel, i);
+    }
+    layer.appendChild(div);
+  });
+  const filledCount = state.slots.filter(s=>s.player).length;
+  document.getElementById('slotsCounter').textContent = `${filledCount} / 11 pozisyon dolu`;
+  renderMoveBar(mover, targetIdx.size);
+}
+function renderMoveBar(mover, targetCount){
+  const bar = document.getElementById('moveBar');
+  if(!mover){ bar.classList.add('hidden'); bar.innerHTML=''; return; }
+  const p = mover.player;
+  const posInfo = p.pos2
+    ? `Mevkiler: <b>${p.basePos}</b> / <b>${p.pos2}</b>`
+    : `Mevki: <b>${p.basePos}</b> (ikincil mevkisi yok)`;
+  const note = targetCount>0
+    ? 'Işıklanan formaya tıkla: boşsa taşınır, doluysa iki oyuncu yer değiştirir.'
+    : 'Bu oyuncunun taşınabileceği uygun bir pozisyon yok.';
+  bar.innerHTML = `
+    <span class="mb-note"><b>${p.n}</b> seçildi · ${posInfo}. ${note}</span>
+    <button class="btn btn-ghost btn-sm" id="mbCancel">Vazgeç</button>`;
+  bar.classList.remove('hidden');
+  document.getElementById('mbCancel').onclick = ()=>{ state.moveSel=null; renderAll(); };
+}
+
+/* ============================================================
+   ROLL: weighted tier draw + slot-machine animation
+   ============================================================ */
+function tierPick(){
+  const x = Math.random();
+  return x<0.22 ? 'elite' : x<0.62 ? 'mid' : 'weak';
+}
+function chooseClub(){
+  const t = tierPick();
+  let pool = CLUBS.filter(c=>c.tier===t && !state.recent.includes(c.id));
+  if(!pool.length) pool = CLUBS.filter(c=>!state.recent.includes(c.id));
+  if(!pool.length) pool = CLUBS;
+  const club = pool[Math.floor(Math.random()*pool.length)];
+  state.recent.push(club.id);
+  if(state.recent.length>8) state.recent.shift();
+  return club;
+}
+function tierLabel(t){ return t==='elite'?'Efsane Final':t==='mid'?'Tarihi Kadro':'Sürpriz Katılımcı'; }
+function setDraftButtonsDisabled(dis){
+  document.getElementById('rollBtn').disabled = dis;
+  document.getElementById('swapYearBtn').disabled = dis;
+  document.getElementById('swapClubBtn').disabled = dis;
+}
+function startRollAnim(target, steps){
+  state.rolling = true;
+  setDraftButtonsDisabled(true);
+  const zone = document.getElementById('offerZone');
+  zone.innerHTML = `<div class="roll-frame" id="rollFrame">
+      <div class="rf-tag" id="rfTag">Kura çekiliyor…</div>
+      <div class="roll-name" id="rollName">&nbsp;</div>
+      <div class="roll-year" id="rollYear">&nbsp;</div>
+    </div>`;
+  const nameEl = document.getElementById('rollName');
+  const yearEl = document.getElementById('rollYear');
+  let i = 0, delay = 45;
+  function step(){
+    if(i>=steps){
+      nameEl.textContent = target.name;
+      nameEl.style.animation='none'; void nameEl.offsetWidth; nameEl.style.animation='';
+      yearEl.textContent = 'ŞL '+target.year+' · '+tierLabel(target.tier);
+      document.getElementById('rollFrame').classList.add('locked');
+      document.getElementById('rfTag').textContent = 'Kura sonucu';
+      setTimeout(()=>{
+        state.rolling = false;
+        state.offeredClub = target;
+        renderAll();
+      }, 620);
+      return;
+    }
+    const c = CLUBS[Math.floor(Math.random()*CLUBS.length)];
+    nameEl.textContent = c.name;
+    nameEl.style.animation='none'; void nameEl.offsetWidth; nameEl.style.animation='';
+    yearEl.textContent = 'ŞL '+c.year;
+    i++; delay *= 1.16;
+    setTimeout(step, delay);
+  }
+  step();
+}
+function rollClub(){
+  if(state.rolling || state.offeredClub) return;
+  if(state.slots.every(s=>s.player)) return;
+  state.draftStarted = true;
+  startRollAnim(chooseClub(), 14);
+}
+function swapSameClubDiffYear(){
+  if(state.rolling || !state.offeredClub || state.swapsLeft<=0) return;
+  const cur = state.offeredClub;
+  const candidates = CLUBS.filter(c=>c.id!==cur.id && c.name===cur.name);
+  if(!candidates.length) return;
+  const next = candidates[Math.floor(Math.random()*candidates.length)];
+  state.swapsLeft--;
+  state.offeredClub = null;
+  renderSwapDots();
+  startRollAnim(next, 9);
+}
+function swapSameYearDiffClub(){
+  if(state.rolling || !state.offeredClub || state.swapsLeft<=0) return;
+  const cur = state.offeredClub;
+  const candidates = CLUBS.filter(c=>c.id!==cur.id && c.year===cur.year);
+  if(!candidates.length) return;
+  const next = candidates[Math.floor(Math.random()*candidates.length)];
+  state.swapsLeft--;
+  state.offeredClub = null;
+  renderSwapDots();
+  startRollAnim(next, 9);
+}
+
+/* ============================================================
+   RENDER: OFFER
+   ============================================================ */
+function renderOffer(){
+  if(state.rolling) return;
+  const zone = document.getElementById('offerZone');
+  const rollBtn = document.getElementById('rollBtn');
+  const swapYearBtn = document.getElementById('swapYearBtn');
+  const swapClubBtn = document.getElementById('swapClubBtn');
+  const full = state.slots.every(s=>s.player);
+
+  rollBtn.disabled = full || !!state.offeredClub;
+
+  const cur = state.offeredClub;
+  const hasYearCandidates = cur && CLUBS.some(c=>c.id!==cur.id && c.name===cur.name);
+  const hasClubCandidates = cur && CLUBS.some(c=>c.id!==cur.id && c.year===cur.year);
+  swapYearBtn.disabled = full || !cur || state.swapsLeft<=0 || !hasYearCandidates;
+  swapClubBtn.disabled = full || !cur || state.swapsLeft<=0 || !hasClubCandidates;
+
+  if(full){
+    zone.innerHTML = '<div class="finish-hint">✅ On bir tamamlandı! Aşağıdan Şampiyonlar Ligi\'ni başlatabilirsin.</div>';
+    return;
+  }
+  if(!state.offeredClub){
+    zone.innerHTML = '<div class="empty-hint">Kadro havuzundan bir takım çekmek için <b style="color:var(--cyan)">Zar At</b>\'a bas.</div>';
+    return;
+  }
+  const club = state.offeredClub;
+  const card = document.createElement('div');
+  card.className='club-card';
+  const head = document.createElement('div');
+  head.className='club-head';
+  head.innerHTML = `<div><b>${club.name}</b><span class="yr"> · ŞL ${club.year}</span></div><span class="tier ${club.tier}">${tierLabel(club.tier)}</span>`;
+  card.appendChild(head);
+  const list = document.createElement('div');
+  list.className='club-players';
+  const order = {GK:0,CB:1,LB:2,RB:3,LWB:4,RWB:5,CDM:6,CM:7,CAM:8,LM:9,RM:10,LW:11,RW:12,ST:13,CF:14};
+  [...club.players].sort((a,b)=>order[a.pos]-order[b.pos]).forEach(p=>{
+    const row = document.createElement('div');
+    row.className='p-row';
+    const posList = p.pos2 ? [p.pos, p.pos2] : [p.pos];
+    const btns = posList.map(pos=>{
+      const slot = state.slots.find(s=>!s.player && fits(s.pos,pos));
+      const disabled = p.taken || !slot;
+      const cls = pos===p.pos ? '' : 'p2btn';
+      return `<button class="${cls}" data-pos="${pos}" ${disabled?'disabled':''}>${pos}</button>`;
+    }).join('');
+    row.innerHTML = `<span class="postags">${p.pos}${p.pos2?`<span class="p2"> / ${p.pos2}</span>`:''}</span><span class="pn${p.leg?' leg':''}">${p.n}${p.leg?' ★':''}</span><span class="pr">${p.r}</span><span class="pickbtns">${btns}</span>`;
+    row.querySelectorAll('button[data-pos]').forEach(btn=>{
+      btn.onclick = ()=>{
+        const chosenPos = btn.getAttribute('data-pos');
+        const slot = state.slots.find(s=>!s.player && fits(s.pos,chosenPos));
+        if(!slot) return;
+        p.taken = true;
+        slot.player = {id:p.id, n:p.n, basePos:p.pos, pos2:p.pos2, pos:slot.pos, r:p.r, leg:p.leg, club:club.name+' '+club.year};
+        state.offeredClub = null;
+        state.moveSel = null;
+        renderAll();
+      };
+    });
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+  zone.innerHTML='';
+  zone.appendChild(card);
+}
+
+function renderStartBtn(){
+  const full = state.slots.every(s=>s.player);
+  document.getElementById('startSimBtn').disabled = !full;
+}
+
+function renderAll(){
+  renderControls();
+  renderPitch();
+  renderRating();
+  renderSwapDots();
+  renderOffer();
+  renderStartBtn();
+}
+
+document.getElementById('rollBtn').addEventListener('click', rollClub);
+document.getElementById('swapYearBtn').addEventListener('click', swapSameClubDiffYear);
+document.getElementById('swapClubBtn').addEventListener('click', swapSameYearDiffClub);
+
+/* ============================================================
+   SIMULATION ENGINE
+   ============================================================ */
+function poisson(lambda){ const L=Math.exp(-lambda); let k=0,p=1; do{k++;p*=Math.random();}while(p>L); return k-1; }
+function rand(min,max){ return min + Math.random()*(max-min); }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function pickScorer(count){
+  const weighted = [];
+  state.slots.filter(s=>s.player).forEach(s=>{
+    const attackPos=['ST','CF','LW','RW','CAM'], midPos=['CDM','CM','LM','RM'];
+    const w = attackPos.includes(s.pos)?6 : midPos.includes(s.pos)?3 : 1.1;
+    weighted.push({name:s.player.n, w});
+  });
+  const total = weighted.reduce((a,b)=>a+b.w,0);
+  const out=[];
+  for(let i=0;i<count;i++){
+    let r=Math.random()*total, acc=0, chosen=weighted[0];
+    for(const w of weighted){ acc+=w.w; if(r<=acc){chosen=w;break;} }
+    out.push(chosen.name);
+  }
+  return out;
+}
+
+function simSingle(myAtk,myDef,oppRating,extraTime){
+  let lamMe = Math.min(4.3, Math.max(0.15, 1.3 + (myAtk-oppRating)/13));
+  let lamOpp = Math.min(4.0, Math.max(0.1, 1.15 + (oppRating-myDef)/13));
+  let myG = poisson(lamMe), oppG = poisson(lamOpp);
+  let wentET=false, wentPens=false, penResult=null, penScore=null;
+  if(extraTime && myG===oppG){
+    wentET = true;
+    myG += poisson(lamMe*0.35);
+    oppG += poisson(lamOpp*0.35);
+    if(myG===oppG){
+      wentPens = true;
+      const strengthGap = ((myAtk+myDef)/2) - oppRating;
+      const probMe = Math.min(0.72, Math.max(0.28, 0.5 + strengthGap/160));
+      penResult = Math.random()<probMe ? 'me' : 'opp';
+      const winScore = Math.floor(rand(3,6));
+      const loseScore = Math.max(0, winScore - (Math.random()<0.6?1:2));
+      penScore = penResult==='me' ? [winScore,loseScore] : [loseScore,winScore];
+    }
+  }
+  const totalMinutes = wentET ? 120 : 90;
+  const myEvents = pickScorer(myG).map(n=>({min:Math.floor(rand(1,totalMinutes)), team:'me', name:n}));
+  const oppEvents = [];
+  for(let i=0;i<oppG;i++) oppEvents.push({min:Math.floor(rand(1,totalMinutes)), team:'opp', name:null});
+  const events = [...myEvents,...oppEvents].sort((a,b)=>a.min-b.min);
+  return {myG,oppG,wentET,wentPens,penResult,penScore,totalMinutes,events};
+}
+
+function outcomeLetter(m){
+  if(m.wentPens) return m.penResult==='me' ? 'W' : 'L';
+  return m.myG>m.oppG?'W':m.myG<m.oppG?'L':'D';
+}
+function outcomeWord(l){ return l==='W'?'GALİBİYET':l==='D'?'BERABERE':'MAĞLUBİYET'; }
+
+/* ============================================================
+   TOURNAMENT BUILD (real opponents, progressive standings)
+   ============================================================ */
+let tournament = null;
+
+function buildTournament(){
+  const r = computeRatings();
+  const pool = shuffle(OPP_POOL).slice(0,35).map(o=>({name:o[0], r:o[1], wPts:[], wGd:[]}));
+  const myOppIdx = shuffle([...Array(35).keys()]).slice(0,8);
+
+  const league = [];
+  let pts=0, gf=0, ga=0, w=0, d=0, l=0;
+  for(let i=0;i<8;i++){
+    const oppClub = pool[myOppIdx[i]];
+    const res = simSingle(r.atk, r.def, oppClub.r, false);
+    const oc = res.myG>res.oppG?'W':res.myG<res.oppG?'L':'D';
+    pts += oc==='W'?3:oc==='D'?1:0;
+    gf+=res.myG; ga+=res.oppG;
+    if(oc==='W')w++; else if(oc==='D')d++; else l++;
+    league.push({opp:oppClub.name,oppR:oppClub.r,...res,outcome:oc,week:i+1});
+  }
+  // other clubs' week-by-week results (opponent of the week mirrors my result)
+  for(let wk=0;wk<8;wk++){
+    pool.forEach((o,idx)=>{
+      if(idx===myOppIdx[wk]){
+        const m = league[wk];
+        o.wPts.push(m.outcome==='W'?0:m.outcome==='D'?1:3);
+        o.wGd.push(m.oppG-m.myG);
+        return;
+      }
+      const pW = Math.min(0.68, Math.max(0.12, 0.16+(o.r-68)*0.018));
+      const x = Math.random();
+      if(x<pW){ o.wPts.push(3); o.wGd.push(1+(Math.random()<0.4?1:0)+(Math.random()<0.12?1:0)); }
+      else if(x<pW+0.26){ o.wPts.push(1); o.wGd.push(0); }
+      else { o.wPts.push(0); o.wGd.push(-(1+(Math.random()<0.4?1:0))); }
+    });
+  }
+  return {
+    ratings:r, others:pool, league,
+    leagueStats:{pts,gf,ga,w,d,l},
+    table:null, myRank:null, path:null, bracket:null,
+    playoff:null, ko:{ro16:null,qf:null,sf:null,final:null},
+    unbeaten:true, cleanSheets:true, champion:false,
+  };
+}
+
+function leagueTableAt(week){
+  const rows = tournament.others.map(o=>{
+    const seg = o.wPts.slice(0,week);
+    return {
+      name:o.name, r:o.r,
+      pts: seg.reduce((a,b)=>a+b,0),
+      gd: o.wGd.slice(0,week).reduce((a,b)=>a+b,0),
+      w: seg.filter(x=>x===3).length,
+      d: seg.filter(x=>x===1).length,
+      l: seg.filter(x=>x===0).length,
+    };
+  });
+  const seg = tournament.league.slice(0,week);
+  let pts=0,w=0,d=0,l=0,gf=0,ga=0;
+  seg.forEach(m=>{
+    pts += m.outcome==='W'?3:m.outcome==='D'?1:0;
+    if(m.outcome==='W')w++; else if(m.outcome==='D')d++; else l++;
+    gf+=m.myG; ga+=m.oppG;
+  });
+  rows.push({name:'Senin Takımın', isMe:true, r:tournament.ratings.ovr, pts, gd:gf-ga, w, d, l});
+  rows.sort((a,b)=> b.pts-a.pts || b.gd-a.gd || a.name.localeCompare(b.name));
+  return rows;
+}
+
+function standingsHTML(week, title){
+  const rows = leagueTableAt(week);
+  const body = rows.map((row,i)=>{
+    const rank=i+1;
+    const zoneClass = rank<=8?'zone-r16':rank<=24?'zone-po':'zone-out';
+    return `<tr class="${row.isMe?'me':''}"><td class="${zoneClass}">${rank}</td><td>${row.name}</td><td>${week}</td><td>${row.w}</td><td>${row.d}</td><td>${row.l}</td><td>${row.gd>0?'+':''}${row.gd}</td><td>${row.pts}</td></tr>`;
+  }).join('');
+  return `<div class="table-wrap">
+    <div class="tw-title">${title}</div>
+    <div class="table-scroll">
+      <table class="lg"><thead><tr><th>#</th><th>Takım</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AV</th><th>P</th></tr></thead>
+      <tbody>${body}</tbody></table>
+    </div>
+    <div class="legend-row"><span><i style="background:var(--green)"></i>1-8 Doğrudan Son 16</span><span><i style="background:var(--gold)"></i>9-24 Play-off</span><span><i style="background:var(--red)"></i>25-36 Elendi</span></div>
+  </div>`;
+}
+
+/* ============================================================
+   KNOCKOUT BRACKET
+   ============================================================ */
+const BR_COLS = [['po','Play-off'],['r16','Son 16'],['qf','Çeyrek Final'],['sf','Yarı Final'],['f','Final']];
+
+function buildBracket(){
+  const seeds = tournament.table.map(row=>({name:row.isMe?'Senin Takımın':row.name, r:row.isMe?tournament.ratings.ovr:row.r, me:!!row.isMe}));
+  const po=[], r16=[], qf=[], sf=[], f=[];
+  for(let i=0;i<8;i++) po.push({a:seeds[8+i], b:seeds[23-i], winner:null, disp:null});
+  for(let i=0;i<8;i++) r16.push({a:seeds[i], b:null, winner:null, disp:null});
+  for(let i=0;i<4;i++) qf.push({a:null,b:null,winner:null,disp:null});
+  for(let i=0;i<2;i++) sf.push({a:null,b:null,winner:null,disp:null});
+  f.push({a:null,b:null,winner:null,disp:null});
+  tournament.bracket = {po,r16,qf,sf,f};
+}
+function advance(key, idx, team){
+  const br = tournament.bracket;
+  if(key==='po'){ br.r16[7-idx].b = team; }
+  else if(key==='r16'){ const m=br.qf[idx>>1]; if(idx%2===0) m.a=team; else m.b=team; }
+  else if(key==='qf'){ const m=br.sf[idx>>1]; if(idx%2===0) m.a=team; else m.b=team; }
+  else if(key==='sf'){ const m=br.f[0]; if(idx%2===0) m.a=team; else m.b=team; }
+}
+function resolveOthers(key){
+  tournament.bracket[key].forEach((m,i)=>{
+    if(m.winner || !m.a || !m.b) return;
+    if(m.a.me || m.b.me) return;
+    const pA = Math.min(0.88, Math.max(0.12, 0.5 + (m.a.r-m.b.r)/60));
+    const aWins = Math.random()<pA;
+    const wg = 1+Math.floor(Math.random()*3);
+    const lg = Math.floor(Math.random()*wg);
+    m.winner = aWins? m.a : m.b;
+    m.disp = aWins? `${wg}-${lg}` : `${lg}-${wg}`;
+    advance(key, i, m.winner);
+  });
+}
+function findMyMatch(key){
+  const arr = tournament.bracket[key];
+  const idx = arr.findIndex(m=> (m.a&&m.a.me)||(m.b&&m.b.me));
+  return idx<0? null : {m:arr[idx], idx};
+}
+function recordMyResult(key, match){
+  const found = findMyMatch(key);
+  if(!found) return;
+  const {m, idx} = found;
+  const meIsA = !!(m.a && m.a.me);
+  const meSide = meIsA? m.a : m.b;
+  const oppSide = meIsA? m.b : m.a;
+  let disp = meIsA? `${match.myG}-${match.oppG}` : `${match.oppG}-${match.myG}`;
+  if(match.wentPens){
+    const ps = meIsA? match.penScore : [match.penScore[1],match.penScore[0]];
+    disp += ` (P ${ps[0]}-${ps[1]})`;
+  } else if(match.wentET){
+    disp += ' (U.D.)';
+  }
+  m.disp = disp;
+  m.winner = outcomeLetter(match)==='W'? meSide : oppSide;
+  advance(key, idx, m.winner);
+}
+function bracketHTML(){
+  const br = tournament.bracket;
+  if(!br) return '';
+  const cols = BR_COLS.map(([key,label])=>{
+    const matches = br[key].map(m=>{
+      const mine = (m.a&&m.a.me)||(m.b&&m.b.me);
+      const score = m.disp? m.disp.split(' ')[0].split('-') : ['',''];
+      const pen = m.disp && m.disp.includes('(') ? `<div class="b-pen">${m.disp.slice(m.disp.indexOf('('))}</div>` : '';
+      const row = (t, sc)=>{
+        let cls='b-row';
+        if(m.winner && t===m.winner) cls+=' win';
+        if(t&&t.me) cls+=' meRow';
+        return `<div class="${cls}"><span class="bn">${t?t.name:'—'}</span><span class="bs">${sc}</span></div>`;
+      };
+      return `<div class="b-match${mine?' mine':''}">${row(m.a,score[0])}${row(m.b,score[1])}${pen}</div>`;
+    }).join('');
+    return `<div class="b-col"><h5>${label}</h5><div class="b-matches">${matches}</div></div>`;
+  }).join('');
+  return `<div class="bracket-wrap"><div class="tw-title">Turnuva Ağacı</div><div class="bracket">${cols}</div></div>`;
+}
+function renderBracket(){
+  const zone = document.getElementById('bracketZone');
+  if(zone) zone.innerHTML = bracketHTML();
+}
+
+/* ============================================================
+   PHASE BAR
+   ============================================================ */
+const STAGE_KEYS = ['league','playoff','ro16','qf','sf','final'];
+const STAGE_LABELS = {league:'LİG FAZI',playoff:'PLAY-OFF',ro16:'SON 16',qf:'ÇEYREK FİNAL',sf:'YARI FİNAL',final:'FİNAL'};
+
+function renderTree(currentKey){
+  const bar = document.getElementById('treeBar');
+  bar.innerHTML='';
+  STAGE_KEYS.forEach((key,i)=>{
+    if(i>0){
+      const arrow = document.createElement('div');
+      arrow.className='tree-arrow';
+      arrow.textContent='→';
+      bar.appendChild(arrow);
+    }
+    const node = document.createElement('div');
+    let cls='tree-node', status='Bekliyor';
+    if(key==='playoff' && tournament.path==='direct'){
+      cls+=' skip'; status='Atlandı';
+    } else if(key==='league'){
+      if(!tournament._leagueDone){ cls += currentKey==='league'?' active':' upcoming'; status = currentKey==='league'?'Oynanıyor':'Bekliyor'; }
+      else { cls += tournament.path==='out' ? ' loss':' win'; status = tournament.path==='out' ? (tournament.myRank+'. sıra — Elendi') : (tournament.myRank+'. sıra'); }
+    } else {
+      const m = key==='playoff'? tournament.playoff : tournament.ko[key];
+      if(m){ const oc=outcomeLetter(m); cls += oc==='W'?' win':' loss'; status = oc==='W' ? fmtScoreline(m)+' (K)' : fmtScoreline(m)+' (Elendi)'; }
+      else if(currentKey===key){ cls+=' active'; status='Oynanıyor'; }
+      else { cls+=' upcoming'; status='Bekliyor'; }
+    }
+    node.className=cls;
+    node.innerHTML = `<div class="tn-label">${STAGE_LABELS[key]}</div><div class="tn-status">${status}</div>`;
+    bar.appendChild(node);
+  });
+}
+
+function fmtScoreline(m){
+  let s=`${m.myG}-${m.oppG}`;
+  if(m.wentPens) s+= ` (Pen ${m.penScore[0]}-${m.penScore[1]})`;
+  else if(m.wentET) s+=' (U.D.)';
+  return s;
+}
+
+/* ============================================================
+   STAGE RULES TEXT
+   ============================================================ */
+const RULES_TEXT = {
+  leagueMatch: (wk)=>`<h3>LİG FAZI — ${wk}. HAFTA / 8</h3><div class="vs">36 takımlık tek lig fazı · tek maç, 90 dakika</div><ul><li>Galibiyet 3 puan, beraberlik 1 puan, mağlubiyet 0 puan</li><li>8 hafta sonunda ilk 8 doğrudan Son 16'ya yükselir</li><li>9-24. sıradaki takımlar play-off oynar, 25-36 elenir</li><li>Her maçtan sonra güncel puan durumunu görürsün</li></ul>`,
+  playoff: ()=>`<h3>PLAY-OFF TURU</h3><div class="vs">Son 16 bileti için tek maç eleme</div><ul><li>Eşleşmeler lig sıralamasına göre: 9. sıra 24. ile, 10. sıra 23. ile...</li><li>90 dakikada berabere biterse uzatma oynanır</li><li>Uzatmada da eşitlik bozulmazsa seri penaltı atışlarına gidilir</li><li>Kazanan Son 16'ya yükselir, kaybeden turnuvadan elenir</li></ul>`,
+  ro16: ()=>`<h3>SON 16</h3><div class="vs">Tek maç eleme usulü</div><ul><li>Lig fazının ilk 8'i, play-off kazananlarıyla eşleşir</li><li>90 dakika sonunda berabere ise uzatma, sonra gerekirse penaltılar</li><li>Kazanan çeyrek finale yükselir</li></ul>`,
+  qf: ()=>`<h3>ÇEYREK FİNAL</h3><div class="vs">Tek maç eleme usulü</div><ul><li>Rakipler bu turda daha güçlü — dikkatli oynanmalı</li><li>Berabere biterse uzatma ve gerekirse penaltılar devreye girer</li></ul>`,
+  sf: ()=>`<h3>YARI FİNAL</h3><div class="vs">Kupaya bir adım kala</div><ul><li>Tek maç eleme, uzatma ve penaltı kuralları geçerli</li><li>Kazanan finalde kupa için oynayacak</li></ul>`,
+  final: ()=>`<h3>FİNAL 🏆</h3><div class="vs">Nötr sahada, tek maçta şampiyon belli oluyor</div><ul><li>Berabere biterse uzatma, sonra gerekirse penaltılar</li><li>Bu maçı kazanan Şampiyonlar Ligi'ni kaldırıyor</li></ul>`,
+};
+
+/* ============================================================
+   STAGE RENDERING / FLOW
+   ============================================================ */
+function showTourneyView(){
+  document.getElementById('draftView').classList.add('hidden');
+  document.getElementById('tourneyView').classList.remove('hidden');
+  document.getElementById('navPhase').textContent = 'TURNUVA';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('startSimBtn').addEventListener('click', ()=>{
+  tournament = buildTournament();
+  tournament._leagueDone = false;
+  showTourneyView();
+  runLeaguePhase();
+});
+
+let leagueWeekIdx = 0;
+function runLeaguePhase(){
+  renderTree('league');
+  const content = document.getElementById('stageContent');
+  content.innerHTML = `<div id="rulesSlot"></div><div id="liveSlot"></div><div id="standingsSlot"></div><div id="pastMatches"></div>`;
+  leagueWeekIdx = 0;
+  playLeagueWeek();
+}
+function playLeagueWeek(){
+  if(leagueWeekIdx>=8){
+    finishLeaguePhase();
+    return;
+  }
+  const match = tournament.league[leagueWeekIdx];
+  document.getElementById('rulesSlot').innerHTML = `<div class="rules-card">${RULES_TEXT.leagueMatch(match.week)}<div class="vs">Rakip: <b>${match.opp}</b> (güç ${match.oppR})</div></div>`;
+  playLiveMatch(match, 'Senin Takımın', match.opp, ()=>{
+    leagueWeekIdx++;
+    const div = document.createElement('div');
+    div.innerHTML = renderFinalCard(match, `Hafta ${match.week}`);
+    document.getElementById('pastMatches').prepend(div.firstElementChild);
+    document.getElementById('standingsSlot').innerHTML = standingsHTML(leagueWeekIdx, `Puan Durumu — ${leagueWeekIdx}. Hafta Sonu`);
+    document.getElementById('liveSlot').innerHTML = `<div class="continue-row"><button class="btn btn-primary" id="nextWeekBtn">${leagueWeekIdx<8?'Sıradaki Maça Geç →':'Lig Fazını Bitir →'}</button></div>`;
+    document.getElementById('nextWeekBtn').onclick = playLeagueWeek;
+  });
+}
+function finishLeaguePhase(){
+  tournament._leagueDone = true;
+  tournament.league.forEach(m=>{ if(m.outcome==='L') tournament.unbeaten=false; if(m.oppG>0) tournament.cleanSheets=false; });
+  tournament.table = leagueTableAt(8);
+  tournament.myRank = tournament.table.findIndex(t=>t.isMe)+1;
+  tournament.path = tournament.myRank<=8 ? 'direct' : tournament.myRank<=24 ? 'playoff' : 'out';
+  if(tournament.path!=='out') buildBracket();
+  renderTree('league');
+  const content = document.getElementById('stageContent');
+  const nextLabel = tournament.path==='direct' ? `${tournament.myRank}. sıra — Doğrudan Son 16'ya Geç →` :
+    tournament.path==='playoff' ? `${tournament.myRank}. sıra — Play-off'a Git →` : `${tournament.myRank}. sıra — Kampanyayı Sonlandır →`;
+  content.innerHTML = `
+    <div class="rules-card"><h3>LİG FAZI TAMAMLANDI</h3><div class="vs">Final sıralaman: <b>${tournament.myRank}. sıra</b> / 36</div></div>
+    ${standingsHTML(8,'Nihai Puan Durumu')}
+    ${tournament.bracket? '<div id="bracketZone"></div>' : ''}
+    <div class="continue-row"><button class="btn btn-primary" id="afterLeagueBtn">${nextLabel}</button></div>`;
+  renderBracket();
+  document.getElementById('afterLeagueBtn').onclick = afterLeague;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function afterLeague(){
+  if(tournament.path==='out'){
+    finalizeTotals();
+    showTrophyOrOut('LİG FAZINDA '+tournament.myRank+'. SIRA — ELENDİN');
+    return;
+  }
+  if(tournament.path==='playoff'){ runPlayoff(); return; }
+  // direct: play-off round of others still happens
+  resolveOthers('po');
+  runKoRound('ro16');
+}
+function runPlayoff(){
+  renderTree('playoff');
+  resolveOthers('po');
+  const found = findMyMatch('po');
+  const opp = found.m.a.me ? found.m.b : found.m.a;
+  const match = {opp:opp.name, oppR:opp.r, ...simSingle(tournament.ratings.atk, tournament.ratings.def, opp.r, true)};
+  tournament.playoff = match;
+  const content = document.getElementById('stageContent');
+  content.innerHTML = `<div id="rulesSlot"><div class="rules-card">${RULES_TEXT.playoff()}<div class="vs">Rakip: <b>${opp.name}</b> (güç ${opp.r})</div></div></div><div id="bracketZone"></div><div id="liveSlot"></div>`;
+  renderBracket();
+  playLiveMatch(match,'Senin Takımın',opp.name, ()=>{
+    if(match.oppG>0) tournament.cleanSheets=false;
+    const oc = outcomeLetter(match);
+    recordMyResult('po', match);
+    renderBracket();
+    document.getElementById('liveSlot').insertAdjacentHTML('beforeend', renderFinalCard(match,'Play-off'));
+    renderTree('playoff');
+    if(oc!=='W'){
+      tournament.unbeaten=false;
+      document.getElementById('liveSlot').insertAdjacentHTML('beforeend', `<div class="continue-row"><button class="btn btn-primary" id="afterPoBtn">Sonucu Gör →</button></div>`);
+      document.getElementById('afterPoBtn').onclick = ()=>{ finalizeTotals(); showTrophyOrOut('PLAY-OFF TURUNDA ELENDİN'); };
+    } else {
+      document.getElementById('liveSlot').insertAdjacentHTML('beforeend', `<div class="continue-row"><button class="btn btn-primary" id="afterPoBtn">Son 16'ya Geç →</button></div>`);
+      document.getElementById('afterPoBtn').onclick = ()=>runKoRound('ro16');
+    }
+  });
+}
+const KO_ORDER = ['ro16','qf','sf','final'];
+const KO_TO_BR = {ro16:'r16', qf:'qf', sf:'sf', final:'f'};
+function runKoRound(key){
+  renderTree(key);
+  const bk = KO_TO_BR[key];
+  resolveOthers(bk);
+  const found = findMyMatch(bk);
+  const opp = found.m.a.me ? found.m.b : found.m.a;
+  const match = {opp:opp.name, oppR:opp.r, ...simSingle(tournament.ratings.atk, tournament.ratings.def, opp.r, true)};
+  tournament.ko[key] = match;
+  const content = document.getElementById('stageContent');
+  content.innerHTML = `<div id="rulesSlot"><div class="rules-card">${RULES_TEXT[key]()}<div class="vs">Rakip: <b>${opp.name}</b> (güç ${opp.r})</div></div></div><div id="bracketZone"></div><div id="liveSlot"></div>`;
+  renderBracket();
+  playLiveMatch(match,'Senin Takımın',opp.name, ()=>{
+    if(match.oppG>0) tournament.cleanSheets=false;
+    const oc = outcomeLetter(match);
+    recordMyResult(bk, match);
+    renderBracket();
+    document.getElementById('liveSlot').insertAdjacentHTML('beforeend', renderFinalCard(match,STAGE_LABELS[key]));
+    renderTree(key);
+    if(oc!=='W'){
+      tournament.unbeaten=false;
+      document.getElementById('liveSlot').insertAdjacentHTML('beforeend', `<div class="continue-row"><button class="btn btn-primary" id="afterKoBtn">Sonucu Gör →</button></div>`);
+      document.getElementById('afterKoBtn').onclick = ()=>{ finalizeTotals(); showTrophyOrOut(STAGE_LABELS[key]+' TURUNDA ELENDİN'); };
+    } else {
+      const idx = KO_ORDER.indexOf(key);
+      if(idx===KO_ORDER.length-1){
+        document.getElementById('liveSlot').insertAdjacentHTML('beforeend', `<div class="continue-row"><button class="btn btn-gold" id="afterKoBtn">Kupayı Kaldır →</button></div>`);
+        document.getElementById('afterKoBtn').onclick = ()=>{ tournament.champion=true; finalizeTotals(); showTrophyOrOut(); };
+      } else {
+        const nextKey = KO_ORDER[idx+1];
+        document.getElementById('liveSlot').insertAdjacentHTML('beforeend', `<div class="continue-row"><button class="btn btn-primary" id="afterKoBtn">${STAGE_LABELS[nextKey]}'e Geç →</button></div>`);
+        document.getElementById('afterKoBtn').onclick = ()=>runKoRound(nextKey);
+      }
+    }
+  });
+}
+
+function finalizeTotals(){
+  let w=0,gf=0,ga=0;
+  w+=tournament.leagueStats.w; gf+=tournament.leagueStats.gf; ga+=tournament.leagueStats.ga;
+  const extra=[tournament.playoff,tournament.ko.ro16,tournament.ko.qf,tournament.ko.sf,tournament.ko.final].filter(Boolean);
+  extra.forEach(m=>{ gf+=m.myG; ga+=m.oppG; if(outcomeLetter(m)==='W') w++; });
+  tournament.totalW=w; tournament.totalGF=gf; tournament.totalGA=ga;
+}
+
+function showTrophyOrOut(reason){
+  const content = document.getElementById('stageContent');
+  const box = document.createElement('div');
+  const bracketPart = tournament.bracket ? '<div id="bracketZone"></div>' : '';
+  if(tournament.champion){
+    const perfect = tournament.unbeaten && tournament.cleanSheets;
+    box.innerHTML = `<div><div class="trophy-screen">
+      <svg class="starball spin-slow" width="64" height="64" viewBox="0 0 100 100" style="color:var(--gold);margin-bottom:8px;margin-left:auto;margin-right:auto;"><path d="M50 4 L58 38 L94 42 L64 58 L74 92 L50 70 L26 92 L36 58 L6 42 L42 38 Z"/></svg>
+      <div class="eyebrow" style="justify-content:center">ŞAMPİYONLAR LİGİ</div>
+      <h2>ŞAMPİYONSUN 🏆</h2>
+      ${perfect?'<div class="badge-perfect">⭐ Kusursuz Sezon — Hiç Kaybetmeden, Hiç Gol Yemeden</div>':''}
+      <div class="trophy-stats">
+        <div><b>${tournament.totalW}</b><span>Galibiyet</span></div>
+        <div><b>${tournament.totalGF}</b><span>Atılan Gol</span></div>
+        <div><b>${tournament.totalGA}</b><span>Yenen Gol</span></div>
+        <div><b>${tournament.myRank}.</b><span>Lig Sıralaması</span></div>
+      </div>
+      <button class="btn btn-gold" onclick="restartAll()">Yeni Kadroyla Tekrar Oyna</button>
+    </div>${bracketPart}</div>`;
+  } else {
+    box.innerHTML = `<div><div class="trophy-screen out">
+      <h2>${reason||'KAMPANYA SONA ERDİ'}</h2>
+      <p style="color:var(--text-dim);max-width:480px;margin:14px auto 0;">Şampiyonlar Ligi macerası burada bitti. Kadronu değiştirip yeniden dene.</p>
+      <div class="trophy-stats">
+        <div><b>${tournament.totalW||0}</b><span>Galibiyet</span></div>
+        <div><b>${tournament.totalGF||0}</b><span>Atılan Gol</span></div>
+        <div><b>${tournament.totalGA||0}</b><span>Yenen Gol</span></div>
+        <div><b>${tournament.myRank}.</b><span>Lig Sıralaması</span></div>
+      </div>
+      <button class="btn btn-primary" onclick="restartAll()">Yeni Kadroyla Tekrar Oyna</button>
+    </div>${bracketPart}</div>`;
+  }
+  content.innerHTML='';
+  content.appendChild(box.firstElementChild);
+  renderBracket();
+  window.scrollTo({top:content.getBoundingClientRect().top+window.scrollY-80, behavior:'smooth'});
+}
+
+function restartAll(){
+  tournament=null;
+  document.getElementById('tourneyView').classList.add('hidden');
+  document.getElementById('draftView').classList.remove('hidden');
+  document.getElementById('navPhase').textContent='DRAFT AŞAMASI';
+  resetSquad();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============================================================
+   LIVE MATCH PLAYBACK
+   ============================================================ */
+function playLiveMatch(match, myLabel, oppLabel, onDone){
+  const slot = document.getElementById('liveSlot');
+  slot.innerHTML = `
+    <div class="live-panel">
+      <div class="live-top">
+        <div class="live-clock"><span class="live-dot"></span> CANLI</div>
+        <div class="live-clock" id="liveMinute">0'</div>
+      </div>
+      <div class="live-score">
+        <div class="live-team">${myLabel}</div>
+        <div class="live-num" id="liveScoreNum">0 - 0</div>
+        <div class="live-team">${oppLabel}</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="liveProgress"></div></div>
+      <div class="feed" id="liveFeed"></div>
+      <div id="penZone"></div>
+    </div>`;
+  const minuteEl = document.getElementById('liveMinute');
+  const scoreEl = document.getElementById('liveScoreNum');
+  const progressEl = document.getElementById('liveProgress');
+  const feedEl = document.getElementById('liveFeed');
+
+  let minute = 0, myScore=0, oppScore=0;
+  const totalMin = match.totalMinutes;
+  const events = [...match.events];
+  let evIdx = 0;
+  const tickMs = totalMin>90 ? 28 : 34;
+
+  const timer = setInterval(()=>{
+    minute++;
+    minuteEl.textContent = (minute>90? (90+'+'+(minute-90)) : minute)+"'";
+    progressEl.style.width = Math.min(100,(minute/totalMin)*100)+'%';
+    while(evIdx<events.length && events[evIdx].min<=minute){
+      const ev = events[evIdx];
+      if(ev.team==='me') myScore++; else oppScore++;
+      scoreEl.textContent = `${myScore} - ${oppScore}`;
+      const item = document.createElement('div');
+      item.className='feed-item'+(ev.team==='opp'?' opp':'');
+      item.innerHTML = ev.team==='me'
+        ? `<span class="fmin">${ev.min}'</span> ⚽ <b>${ev.name}</b> golü buldu!`
+        : `<span class="fmin">${ev.min}'</span> ⚽ ${oppLabel} golü buldu.`;
+      feedEl.prepend(item);
+      evIdx++;
+    }
+    if(minute>=totalMin){
+      clearInterval(timer);
+      if(match.wentPens){
+        playPenalties(match, ()=>{ onDone(); });
+      } else {
+        onDone();
+      }
+    }
+  }, tickMs);
+}
+
+function playPenalties(match, onDone){
+  const zone = document.getElementById('penZone');
+  zone.innerHTML = `<div style="text-align:center;font-family:var(--mono);font-size:12px;color:var(--text-dim);margin-top:14px;">PENALTI ATIŞLARI</div><div class="pens-grid" id="penGrid"></div>`;
+  const grid = document.getElementById('penGrid');
+  const [winScore, loseScore] = match.penScore;
+  const meWins = match.penResult==='me';
+  const myFinal = meWins? winScore: loseScore;
+  const oppFinal = meWins? loseScore: winScore;
+  const rounds = Math.max(myFinal,oppFinal, 3);
+  const myKicks=[], oppKicks=[];
+  for(let i=0;i<rounds;i++){ myKicks.push(i<myFinal); oppKicks.push(i<oppFinal); }
+  let i=0;
+  const timer = setInterval(()=>{
+    if(i>=rounds){ clearInterval(timer); setTimeout(onDone, 500); return; }
+    const b1 = document.createElement('div'); b1.className='pen-kick '+(myKicks[i]?'made':'miss'); b1.textContent = myKicks[i]?'✓':'✕';
+    const b2 = document.createElement('div'); b2.className='pen-kick '+(oppKicks[i]?'made':'miss'); b2.textContent = oppKicks[i]?'✓':'✕';
+    grid.appendChild(b1); grid.appendChild(b2);
+    i++;
+  }, 260);
+}
+
+function renderFinalCard(m, tag){
+  const oc = outcomeLetter(m);
+  const goalsLine = m.events.length ? m.events.map(e=> e.team==='me' ? `<span><b>${e.name}</b> ${e.min}'</span>` : `<span style="color:var(--text-dimmer)">Rakip gol ${e.min}'</span>`).join('') : '<span style="color:var(--text-dimmer)">Gol yok</span>';
+  return `<div class="final-card">
+    <div class="fc-top"><span style="font-family:var(--mono);font-size:11px;color:var(--text-dim);text-transform:uppercase;">${tag} · ${m.opp}</span><span class="fc-result ${oc}">${outcomeWord(oc)}</span></div>
+    <div style="text-align:center;font-family:var(--mono);font-size:30px;color:var(--gold);">${fmtScoreline(m)}</div>
+    <div class="fc-goals">${goalsLine}</div>
+  </div>`;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+resetSquad();
+</script>
+</body>
+</html>
