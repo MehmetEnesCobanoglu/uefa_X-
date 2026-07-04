@@ -113,10 +113,10 @@ main{padding-top:26px;}
 .tier.mid{background:rgba(33,182,255,0.15);color:var(--cyan);}
 .tier.weak{background:rgba(255,93,108,0.12);color:var(--red);}
 .club-players{max-height:480px;overflow-y:auto;}
-.p-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line-soft);font-size:15px;flex-wrap:wrap;}
+.p-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line-soft);font-size:15px;flex-wrap:nowrap;}
 .p-row .postags{font-family:var(--mono);font-size:12px;color:var(--text-dim);width:70px;flex-shrink:0;line-height:1.3;}
 .p-row .postags .p2{color:var(--purple);}
-.p-row .pn{flex:1;font-weight:700;min-width:110px;}
+.p-row .pn{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .p-row .pn.leg{color:var(--gold);}
 .p-row .pr{font-family:var(--mono);color:var(--text);font-size:14.5px;font-weight:700;width:30px;text-align:right;flex-shrink:0;}
 .p-row .pickbtns{display:flex;gap:5px;flex-shrink:0;}
@@ -162,7 +162,7 @@ main{padding-top:26px;}
 .slot.target .shirt path{stroke:var(--gold-bright);stroke-dasharray:none;fill:rgba(232,194,92,0.16);}
 .slot.target .shirt .lbl{color:var(--gold-bright);}
 @keyframes targetPulse{0%,100%{filter:drop-shadow(0 0 2px rgba(245,217,122,0.7));}50%{filter:drop-shadow(0 0 10px rgba(245,217,122,1));}}
-.slot .name{font-size:11.5px;color:var(--text-dim);line-height:1.15;max-width:86px;margin:0 auto;font-weight:600;}
+.slot .name{font-size:11.5px;color:var(--text-dim);line-height:1.15;max-width:86px;margin:0 auto;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .slot.filled .name{color:var(--text);font-weight:600;}
 .pitch-hint{font-size:11px;color:var(--text-dimmer);text-align:center;margin-top:10px;}
 .move-bar{margin-top:10px;background:var(--panel-2);border:1px solid var(--gold);border-radius:10px;padding:10px 12px;font-size:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;animation:fadeUp .2s ease;}
@@ -268,7 +268,8 @@ table.lg td.zone-out{box-shadow:inset 3px 0 0 var(--red);}
   .club-players{max-height:400px;}
   .p-row{font-size:14px;padding:10px 10px;gap:8px;}
   .p-row .postags{width:56px;font-size:11px;}
-  .p-row .pn{min-width:80px;}
+  .p-row{gap:7px;}
+  .p-row .postags{width:48px;font-size:10.5px;}
   .p-row button{padding:7px 10px;font-size:12px;}
   .roll-name{font-size:19px;}
   /* tournament */
@@ -288,6 +289,10 @@ table.lg td.zone-out{box-shadow:inset 3px 0 0 var(--red);}
   .trophy-stats{gap:18px;}
   .trophy-stats div b{font-size:21px;}
 }
+.setup-summary{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;}
+.setup-summary b{font-family:var(--mono);color:var(--cyan);}
+.setup-summary .ss-edit{background:none;border:none;color:var(--text-dim);font-size:11.5px;cursor:pointer;text-decoration:underline;font-family:var(--body);padding:4px;}
+.setup-summary .ss-edit:hover{color:var(--cyan);}
 .hidden{display:none !important;}
 ::-webkit-scrollbar{height:8px;width:8px;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
@@ -317,12 +322,14 @@ table.lg td.zone-out{box-shadow:inset 3px 0 0 var(--red);}
 
     <div class="draft-grid2">
       <div class="draft-left">
-        <div class="control-card">
+        <div class="control-card" id="setupCard">
           <h4>Formasyon</h4>
           <div class="chip-row" id="formationChips"></div>
           <h4>Oyun Stili</h4>
           <div class="chip-row" id="styleChips"></div>
+          <button class="btn btn-primary btn-sm btn-block" id="confirmSetupBtn">✓ Dizilişi Onayla</button>
         </div>
+        <div class="setup-summary hidden" id="setupSummary"></div>
 
         <div class="control-card">
           <div class="rating-box">
@@ -533,7 +540,7 @@ function slotFitsPlayer(slot, pl){ return fits(slot.pos, pl.basePos) || (pl.pos2
 let state = {
   formation:'4-3-3', style:'Dengeli',
   slots: [], offeredClub:null, swapsLeft:3, draftStarted:false,
-  rolling:false, moveSel:null, recent:[],
+  rolling:false, moveSel:null, recent:[], setupConfirmed:false,
 };
 
 function buildSlots(formationKey, styleKey){
@@ -563,6 +570,7 @@ function resetSquad(){
   state.rolling = false;
   state.moveSel = null;
   state.recent = [];
+  state.setupConfirmed = false;
   renderAll();
 }
 
@@ -773,7 +781,7 @@ function startRollAnim(target, steps){
   step();
 }
 function rollClub(){
-  if(state.rolling || state.offeredClub) return;
+  if(state.rolling || state.offeredClub || !state.setupConfirmed) return;
   if(state.slots.every(s=>s.player)) return;
   state.draftStarted = true;
   startRollAnim(chooseClub(), 14);
@@ -812,7 +820,7 @@ function renderOffer(){
   const swapClubBtn = document.getElementById('swapClubBtn');
   const full = state.slots.every(s=>s.player);
 
-  rollBtn.disabled = full || !!state.offeredClub;
+  rollBtn.disabled = full || !!state.offeredClub || !state.setupConfirmed;
 
   const cur = state.offeredClub;
   const hasYearCandidates = cur && CLUBS.some(c=>c.id!==cur.id && c.name===cur.name);
@@ -825,7 +833,9 @@ function renderOffer(){
     return;
   }
   if(!state.offeredClub){
-    zone.innerHTML = '<div class="empty-hint">Kadro havuzundan bir takım çekmek için <b style="color:var(--cyan)">Zar At</b>\'a bas.</div>';
+    zone.innerHTML = state.setupConfirmed
+      ? '<div class="empty-hint">Kadro havuzundan bir takım çekmek için <b style="color:var(--cyan)">Zar At</b>\'a bas.</div>'
+      : '<div class="empty-hint">Önce yukarıdan formasyon ve oyun stilini seçip <b style="color:var(--cyan)">Dizilişi Onayla</b>\'ya bas.</div>';
     return;
   }
   const club = state.offeredClub;
@@ -873,7 +883,22 @@ function renderStartBtn(){
   document.getElementById('startSimBtn').disabled = !full;
 }
 
+function renderSetup(){
+  const card = document.getElementById('setupCard');
+  const sum = document.getElementById('setupSummary');
+  if(state.setupConfirmed){
+    card.classList.add('hidden');
+    sum.classList.remove('hidden');
+    sum.innerHTML = `<span>Diziliş: <b>${state.formation}</b> · <b>${state.style}</b></span><button class="ss-edit" id="ssEdit">Değiştir</button>`;
+    document.getElementById('ssEdit').onclick = ()=>{ state.setupConfirmed=false; renderAll(); };
+  } else {
+    card.classList.remove('hidden');
+    sum.classList.add('hidden');
+    sum.innerHTML='';
+  }
+}
 function renderAll(){
+  renderSetup();
   renderControls();
   renderPitch();
   renderRating();
@@ -882,6 +907,7 @@ function renderAll(){
   renderStartBtn();
 }
 
+document.getElementById('confirmSetupBtn').addEventListener('click', ()=>{ state.setupConfirmed=true; renderAll(); });
 document.getElementById('rollBtn').addEventListener('click', rollClub);
 document.getElementById('swapYearBtn').addEventListener('click', swapSameClubDiffYear);
 document.getElementById('swapClubBtn').addEventListener('click', swapSameYearDiffClub);
