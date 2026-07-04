@@ -118,6 +118,8 @@ main{padding-top:26px;}
 .p-row .postags .p2{color:var(--purple);}
 .p-row .pn{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .p-row .pn.leg{color:var(--gold);}
+.p-row.sel{background:rgba(232,194,92,0.10);box-shadow:inset 3px 0 0 var(--gold);}
+.p-row.sel .pn{color:var(--gold-bright);}
 .p-row .pr{font-family:var(--mono);color:var(--text);font-size:14.5px;font-weight:700;width:30px;text-align:right;flex-shrink:0;}
 .p-row .pickbtns{display:flex;gap:5px;flex-shrink:0;}
 .p-row button{background:var(--panel-2);border:1px solid var(--line);color:var(--cyan);border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--mono);}
@@ -371,7 +373,7 @@ table.lg td.zone-out{box-shadow:inset 3px 0 0 var(--red);}
           </svg>
           <div id="slotsLayer"></div>
         </div>
-        <div class="pitch-hint">Sahadaki bir oyuncuya tıkla: oynayabileceği mevkiler altın renginde ışıklanır. Boş formaya tıklarsan oraya taşınır, dolu formaya tıklarsan iki oyuncu yer değiştirir.</div>
+        <div class="pitch-hint">Kadro kartından mevki butonuna bas, sahada ışıklanan formaya tıklayarak oyuncuyu yerleştir. Sahadaki oyuncuya tıklarsan taşıyabilir ya da iki oyuncuyu yer değiştirebilirsin.</div>
         <div id="moveBar" class="hidden"></div>
       </div>
     </div>
@@ -540,7 +542,7 @@ function slotFitsPlayer(slot, pl){ return fits(slot.pos, pl.basePos) || (pl.pos2
 let state = {
   formation:'4-3-3', style:'Dengeli',
   slots: [], offeredClub:null, swapsLeft:3, draftStarted:false,
-  rolling:false, moveSel:null, recent:[], setupConfirmed:false,
+  rolling:false, moveSel:null, pickSel:null, recent:[], setupConfirmed:false,
 };
 
 function buildSlots(formationKey, styleKey){
@@ -569,6 +571,7 @@ function resetSquad(){
   state.draftStarted = false;
   state.rolling = false;
   state.moveSel = null;
+  state.pickSel = null;
   state.recent = [];
   state.setupConfirmed = false;
   renderAll();
@@ -648,6 +651,18 @@ function movePlayerToSlot(fromIdx, toIdx){
   state.moveSel = null;
   renderAll();
 }
+function placePicked(slotIdx){
+  const sel = state.pickSel;
+  if(!sel) return;
+  const slot = state.slots[slotIdx];
+  if(!slot || slot.player || !fits(slot.pos, sel.pos)) return;
+  sel.p.taken = true;
+  slot.player = {id:sel.p.id, n:sel.p.n, basePos:sel.p.pos, pos2:sel.p.pos2, pos:slot.pos, r:sel.p.r, leg:sel.p.leg, club:sel.club.name+' '+sel.club.year};
+  state.pickSel = null;
+  state.offeredClub = null;
+  state.moveSel = null;
+  renderAll();
+}
 function swapPlayers(aIdx, bIdx){
   const a = state.slots[aIdx], b = state.slots[bIdx];
   if(!a.player || !b.player) return;
@@ -662,8 +677,11 @@ function renderPitch(){
   layer.innerHTML='';
   let mover = state.moveSel!=null ? state.slots[state.moveSel] : null;
   if(mover && !mover.player){ state.moveSel=null; mover=null; }
+  const pick = state.pickSel;
   const targetIdx = new Set();
-  if(mover){
+  if(pick){
+    state.slots.forEach((s,i)=>{ if(!s.player && fits(s.pos, pick.pos)) targetIdx.add(i); });
+  } else if(mover){
     const moverIdx = state.moveSel;
     state.slots.forEach((s,i)=>{
       if(i===moverIdx) return;
@@ -689,15 +707,20 @@ function renderPitch(){
       <div class="name">${s.player? s.player.n.split(' ').slice(-1)[0] : POS_FULL[s.pos]}</div>`;
     if(s.player){
       div.title = s.player.n + (s.player.pos2? ' · '+s.player.basePos+' / '+s.player.pos2 : ' · '+s.player.basePos);
-      if(targetIdx.has(i)){
+      if(!pick && targetIdx.has(i)){
         div.title = mover.player.n + ' ↔ ' + s.player.n + ' yer değiştir';
         div.onclick = ()=> swapPlayers(state.moveSel, i);
       } else {
-        div.onclick = ()=>{ state.moveSel = (state.moveSel===i? null : i); renderAll(); };
+        div.onclick = ()=>{ state.pickSel=null; state.moveSel = (state.moveSel===i? null : i); renderAll(); };
       }
     } else if(targetIdx.has(i)){
-      div.title = 'Buraya taşı';
-      div.onclick = ()=> movePlayerToSlot(state.moveSel, i);
+      if(pick){
+        div.title = pick.p.n + ' buraya yerleştir';
+        div.onclick = ()=> placePicked(i);
+      } else {
+        div.title = 'Buraya taşı';
+        div.onclick = ()=> movePlayerToSlot(state.moveSel, i);
+      }
     }
     layer.appendChild(div);
   });
@@ -707,6 +730,15 @@ function renderPitch(){
 }
 function renderMoveBar(mover, targetCount){
   const bar = document.getElementById('moveBar');
+  if(state.pickSel){
+    const sp = state.pickSel;
+    bar.innerHTML = `
+      <span class="mb-note"><b>${sp.p.n}</b> seçildi (<b>${sp.pos}</b>) · Sahada altın ışıkla yanan formaya tıklayarak yerleştir.</span>
+      <button class="btn btn-ghost btn-sm" id="mbCancel">Vazgeç</button>`;
+    bar.classList.remove('hidden');
+    document.getElementById('mbCancel').onclick = ()=>{ state.pickSel=null; renderAll(); };
+    return;
+  }
   if(!mover){ bar.classList.add('hidden'); bar.innerHTML=''; return; }
   const p = mover.player;
   const posInfo = p.pos2
@@ -782,6 +814,7 @@ function startRollAnim(target, steps){
 }
 function rollClub(){
   if(state.rolling || state.offeredClub || !state.setupConfirmed) return;
+  state.pickSel = null;
   if(state.slots.every(s=>s.player)) return;
   state.draftStarted = true;
   startRollAnim(chooseClub(), 14);
@@ -794,6 +827,7 @@ function swapSameClubDiffYear(){
   const next = candidates[Math.floor(Math.random()*candidates.length)];
   state.swapsLeft--;
   state.offeredClub = null;
+  state.pickSel = null;
   renderSwapDots();
   startRollAnim(next, 9);
 }
@@ -805,6 +839,7 @@ function swapSameYearDiffClub(){
   const next = candidates[Math.floor(Math.random()*candidates.length)];
   state.swapsLeft--;
   state.offeredClub = null;
+  state.pickSel = null;
   renderSwapDots();
   startRollAnim(next, 9);
 }
@@ -859,16 +894,17 @@ function renderOffer(){
       return `<button class="${cls}" data-pos="${pos}" ${disabled?'disabled':''}>${pos}</button>`;
     }).join('');
     row.innerHTML = `<span class="postags">${p.pos}${p.pos2?`<span class="p2"> / ${p.pos2}</span>`:''}</span><span class="pn${p.leg?' leg':''}">${p.n}${p.leg?' ★':''}</span><span class="pr">${p.r}</span><span class="pickbtns">${btns}</span>`;
+    if(state.pickSel && state.pickSel.p.id===p.id) row.classList.add('sel');
     row.querySelectorAll('button[data-pos]').forEach(btn=>{
       btn.onclick = ()=>{
         const chosenPos = btn.getAttribute('data-pos');
-        const slot = state.slots.find(s=>!s.player && fits(s.pos,chosenPos));
-        if(!slot) return;
-        p.taken = true;
-        slot.player = {id:p.id, n:p.n, basePos:p.pos, pos2:p.pos2, pos:slot.pos, r:p.r, leg:p.leg, club:club.name+' '+club.year};
-        state.offeredClub = null;
+        if(!state.slots.some(s=>!s.player && fits(s.pos,chosenPos))) return;
+        state.pickSel = {p, club, pos:chosenPos};
         state.moveSel = null;
         renderAll();
+        if(window.matchMedia && window.matchMedia('(max-width:920px)').matches){
+          document.querySelector('.pitch-panel').scrollIntoView({behavior:'smooth', block:'center'});
+        }
       };
     });
     list.appendChild(row);
