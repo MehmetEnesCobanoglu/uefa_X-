@@ -245,6 +245,49 @@ table.lg td.zone-out{box-shadow:inset 3px 0 0 var(--red);}
 .trophy-stats div b{font-family:var(--mono);font-size:26px;color:var(--gold);display:block;}
 .trophy-stats div span{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
 
+
+/* ---------- MOBILE ---------- */
+@media (max-width:640px){
+  main{padding-top:16px;}
+  .logo{font-size:15px;}
+  .logo small{font-size:8px;letter-spacing:1.5px;}
+  #navPhase{font-size:9px;}
+  .section-head p{font-size:13px;}
+  .btn{padding:12px 18px;font-size:13px;}
+  /* pitch: smaller jerseys, more vertical room, no sticky */
+  .pitch-panel{position:static;padding:10px;}
+  .pitch{aspect-ratio:3/4;}
+  .slot{width:60px;}
+  .slot .shirt{width:42px;height:37px;margin-bottom:2px;}
+  .slot .shirt .lbl{font-size:10.5px;}
+  .slot.filled .shirt .lbl{font-size:11px;}
+  .slot .name{font-size:9.5px;max-width:60px;}
+  .pitch-hint{font-size:10px;}
+  .move-bar{font-size:11.5px;padding:9px 10px;}
+  /* drawn club card */
+  .club-players{max-height:400px;}
+  .p-row{font-size:14px;padding:10px 10px;gap:8px;}
+  .p-row .postags{width:56px;font-size:11px;}
+  .p-row .pn{min-width:80px;}
+  .p-row button{padding:7px 10px;font-size:12px;}
+  .roll-name{font-size:19px;}
+  /* tournament */
+  .tree-node{min-width:92px;padding:8px 6px;}
+  .rules-card{padding:14px 16px;}
+  .rules-card h3{font-size:16px;}
+  .rules-card ul{font-size:12px;padding-left:16px;}
+  .live-panel{padding:16px;}
+  .live-num{font-size:30px;min-width:64px;}
+  .live-team{font-size:12.5px;}
+  .feed-item{font-size:12px;padding:7px 9px;}
+  table.lg{font-size:11px;}
+  table.lg th{padding:7px 6px;font-size:8.5px;}
+  table.lg td{padding:6px 6px;}
+  .legend-row{gap:10px;font-size:9.5px;}
+  .b-row .bn{max-width:92px;}
+  .trophy-stats{gap:18px;}
+  .trophy-stats div b{font-size:21px;}
+}
 .hidden{display:none !important;}
 ::-webkit-scrollbar{height:8px;width:8px;}
 ::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
